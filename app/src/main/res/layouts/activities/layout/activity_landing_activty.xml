@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+                name="verifViewModel"
+                type="com.courierdriver.viewmodels.OTPVerificationModel" />
+
+    </data>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".views.home.LandingActivty">
+
+        <FrameLayout
+                android:id="@+id/frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/tablayout"
+                android:layout_marginBottom="5dp" />
+
+        <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tablayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:visibility="visible"
+                app:tabBackground="@color/colorWhite"
+                app:tabIndicatorColor="@color/colorWhite"
+
+                app:tabSelectedTextColor="@color/colorPrimary"
+                app:tabTextAppearance="@style/customizeTabText"
+                app:tabTextColor="@color/tabColor">
+
+            <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:icon="@drawable/ic_tab_order"
+                    android:text="Orders" />
+            <!---->
+
+            <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:icon="@drawable/ic_tab_create"
+                    android:text="Create Order" />
+            <!-- android:icon="@drawable/ic_booking_tab"-->
+            <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:icon="@drawable/ic_tab_notification"
+                    android:text="Notification" />
+            <!-- android:icon="@drawable/ic_wallet_tab"-->
+            <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:icon="@drawable/ic_tab_user"
+                    android:text="Profile" />
+            <!-- android:icon="@drawable/ic_profile_tab"-->
+        </com.google.android.material.tabs.TabLayout>
+
+    </RelativeLayout>
+</layout>
