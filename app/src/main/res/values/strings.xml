@@ -112,9 +112,13 @@
     <string name="booking_history">Booking History</string>
     <string name="fname">First Name</string>
     <string name="lname">Last Name</string>
+    <string name="driving_license_no">Driving License No</string>
+    <string name="transportation_type">Transportation type</string>
     <string name="phone_number">Phone Number</string>
     <string name="accept_terms">Accept Terms and Conditions</string>
     <string name="dummy_name">Karan</string>
+    <string name="front">Front</string>
+    <string name="back_">Back</string>
     <string name="gender">Gender</string>
     <string name="dummy_phone">9123456784</string>
     <string name="dob">Date Of Birth</string>
@@ -217,6 +221,11 @@
     <string name="signup_with">Or Sign up with</string>
     <string name="dont_have_account">Don\'t have an account?</string>
     <string name="signup">Sign up</string>
+    <string name="done">done</string>
+    <string name="pan_card">Pan Card (Photo)</string>
+    <string name="vehicle_informatio">Vehicle Information</string>
+    <string name="driver_license_photo">Driver License Photo</string>
+    <string name="proof_of_address">Proof of address (Aadhar Photo)</string>
     <string name="delivery_few_minutes">Delivery within few minutes</string>
     <string name="new_order">New Order</string>
     <string name="vehicle_type">Vehicle Type</string>

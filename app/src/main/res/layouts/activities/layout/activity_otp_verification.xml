@@ -30,8 +30,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/dp_10"
-                android:background="@drawable/ic_login_logo"
+            android:layout_marginTop="@dimen/dp_30"
+            android:layout_marginBottom="@dimen/dp_30"
+                android:background="@drawable/locoicon"
                 android:textColor="@color/colorWhite"
 
                 />
@@ -51,7 +52,7 @@
                     android:layout_marginTop="@dimen/dp_15"
                     android:text="@string/enter_otp"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/appGrey"
                     android:textSize="24dp"
                     android:textStyle="bold"
                     app:font="@{`bold`}"
@@ -107,9 +108,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:onClick="@{(v) -> verifViewModel.clickListener(v)}"
-
                     android:text="@string/resend_otp"
-                    android:textColor="@color/colorForgotPassword"
+                    android:textColor="@color/appPink"
                     android:textSize="@dimen/sp_14"
                     app:font="@{`regular`}" />
 

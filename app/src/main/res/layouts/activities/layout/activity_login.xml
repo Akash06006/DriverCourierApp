@@ -16,7 +16,7 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
+            android:background="@color/appGrey"
             android:orientation="vertical"
             app:hideKeyBoardOnClick="@{`back` }">
 
@@ -24,8 +24,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/dp_10"
-                android:background="@drawable/ic_login_logo"
+                android:layout_marginTop="@dimen/dp_30"
+            android:layout_marginBottom="@dimen/dp_30"
+                android:background="@drawable/locoicon"
                 android:textColor="@color/colorWhite"
 
                 />
@@ -50,7 +51,7 @@
                         android:layout_marginTop="@dimen/dp_15"
                         android:text="@string/log_in"
                         android:textAllCaps="false"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/appGrey"
                         android:textSize="24dp"
                         android:textStyle="bold"
                         app:font="@{`bold`}"
@@ -92,7 +93,7 @@
                         android:onClick="@{(v) -> loginViewModel.clickListener(v)}"
                         android:text="@string/forgot_password"
                         android:textAllCaps="false"
-                        android:textColor="@color/colorForgotPassword"
+                        android:textColor="@color/appPink"
                         app:font="@{`regular`}"
                         tools:ignore="AllCaps" />
 
@@ -128,6 +129,7 @@
                         android:orientation="horizontal">
 
                     <RelativeLayout
+                        android:id="@+id/google_login"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:layout_marginLeft="5dp"
@@ -192,7 +194,7 @@
                             android:onClick="@{(v) -> loginViewModel.clickListener(v)}"
                             android:text="@string/signup"
                             android:textAllCaps="false"
-                            android:textColor="@color/colorForgotPassword"
+                            android:textColor="@color/appPink"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             app:font="@{`bold`}"

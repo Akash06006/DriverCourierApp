@@ -35,7 +35,7 @@ object GlobalConstants {
     var NOTIFICATION_TOKEN = "notification_token"
     @JvmStatic
     var SESSION_TOKEN = "session_token"
-    @JvmStatic
+    @JvmStatic //http://stgcerb.cerebruminfotech.com:9067/
     val BASE_URL = "http://stgcerb.cerebruminfotech.com:9067/api/"
     @JvmStatic
     val BASE_SERVER = "http://stgcerb.cerebruminfotech.com:9067"

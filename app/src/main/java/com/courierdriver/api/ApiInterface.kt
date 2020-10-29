@@ -12,13 +12,13 @@ interface ApiInterface {
     val profileData : Call<JsonObject>
 
     @Multipart
-    @POST("mobile/auth/update")
+    @POST("delivery/auth/update")
     fun callUpdateProfile(
         @PartMap mHashMap : HashMap<String,
                 RequestBody>, @Part image : MultipartBody.Part?
     ) : Call<JsonObject>
 
-    @GET("mobile/auth/profile")
+    @GET("delivery/auth/profile")
     fun getProfile() : Call<JsonObject>
 
     @GET("mobile/auth/getRegion")
@@ -29,20 +29,25 @@ interface ApiInterface {
 
     @POST("mobile/auth/login")
     fun callLogin(@Body jsonObject : JsonObject) : Call<JsonObject>
+    @POST("delivery/auth/login")
+    fun calldriverLogin(@Body jsonObject : JsonObject) : Call<JsonObject>
 
     @POST("mobile/auth/signup")
     fun callSignup(@Body jsonObject : JsonObject) : Call<JsonObject>
 
-    @POST("mobile/auth/verify")
+    @POST("delivery/auth/signup")
+    fun calldriverSignup(@Body jsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("delivery/auth/verify")
     fun callVerifyUser(@Body jsonObject : JsonObject) : Call<JsonObject>
 
-    @POST("mobile/auth/userByPhonenumber")
+    @POST("delivery/auth/userByPhonenumber")
     fun callForgotPassword(@Body mJsonObject : JsonObject) : Call<JsonObject>//(@Query("countryCode") countryCode : String, @Query("phoneNumber") phoneNumber : String) : Call<JsonObject>
 
     @POST("verify-otp/")
     fun otpVerify(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
-    @POST("mobile/auth/forgotPassword")
+    @POST("delivery/auth/forgotPassword")
     fun resetPassword(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
     @PUT("change-password/")

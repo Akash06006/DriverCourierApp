@@ -87,7 +87,7 @@ class OTPVerificationActivity : BaseActivity() {
                         )
 
                         showToastSuccess(message)
-                        val intent = Intent(this, LandingActivty::class.java)
+                        val intent = Intent(this, DocumentVerificatonActivity::class.java)
                         intent.flags =
                             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)

@@ -57,7 +57,7 @@ class LoginRepository {
 
                     }
 
-                }, ApiClient.getApiInterface().callLogin(jsonObject)
+                }, ApiClient.getApiInterface().calldriverLogin(jsonObject)
             )
 
         }
@@ -94,7 +94,7 @@ class LoginRepository {
 
                     }
 
-                }, ApiClient.getApiInterface().callSignup(jsonObject)
+                }, ApiClient.getApiInterface().calldriverSignup(jsonObject)
             )
 
         }

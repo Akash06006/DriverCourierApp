@@ -9,6 +9,8 @@ import com.courierdriver.constants.GlobalConstants
 import com.courierdriver.databinding.ActivitySplashBinding
 import com.courierdriver.sharedpreference.SharedPrefClass
 import com.courierdriver.utils.BaseActivity
+import com.courierdriver.views.authentication.LoginActivity
+import com.courierdriver.views.home.LandingActivty
 import com.courierdriver.views.tutorials.TutorialActivity
 import com.facebook.AccessToken
 import com.facebook.GraphRequest
@@ -74,11 +76,11 @@ class SplashActivity : BaseActivity() {
         )
             login = sharedPrefClass!!.getPrefValue(this, "isLogin").toString()
         val intent = if (login == "true") {
-            // Intent(this, LandingActivty::class.java)
-            Intent(this, TutorialActivity::class.java)
+             Intent(this, LoginActivity::class.java)
+           // Intent(this, TutorialActivity::class.java)
         } else {
-            // Intent(this, LoginActivity::class.java)
-            Intent(this, TutorialActivity::class.java)
+             Intent(this, LoginActivity::class.java)
+           // Intent(this, TutorialActivity::class.java)
 
         }
 

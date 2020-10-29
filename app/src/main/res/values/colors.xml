@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- <color name="colorPrimary">#0F3C75</color>-->
-    <color name="colorPrimary">#6D60F8</color>
-    <color name="colorPrimaryDark">#6D60F8</color>
+    <color name="colorPrimary">#435E55</color>
+    <color name="colorPrimaryDark">#435E55</color>
     <color name="colorAccent">#000000</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorWhite2">#F9F4F3</color>
     <color name="colorGrey">#7B7C7C</color>
+    <color name="appGrey">#435E55</color>
+    <color name="appPink">#D64161</color>
     <color name="appBackgroundColor">#ffffff</color>
     <color name="colorGreyLight">#EDF0F0</color>
     <!--<color name="colorButton">#FF6871</color>-->

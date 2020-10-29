@@ -223,6 +223,7 @@ class ProfileFragment : BaseFragment(), ChoiceCallBack {
         profieViewModel.isClick().observe(
             this, Observer<String>(function =
             fun(it : String?) {
+
                 when (it) {
                     "toolbar" -> {
                     showToastError("clicked")

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.widget.EditText
 import com.courierdriver.R
 import com.courierdriver.application.MyApplication
+import com.courierdriver.common.FirebaseFunctions
 import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.constants.GlobalConstants
 import com.courierdriver.databinding.ActivitySignupBinding
@@ -83,9 +84,9 @@ class SignupActivity : BaseActivity() {
                              true
                          )*/
                         GlobalConstants.VERIFICATION_TYPE = "signup"
-                        //TODO-- FirebaseFunctions.sendOTP("login", mOtpJsonObject, this)
-                        // mOtpJsonObject.addProperty("phoneNumber", response.data?.phoneNumber)
-                        //mOtpJsonObject.addProperty("countryCode", response.data?.countryCode)
+                        FirebaseFunctions.sendOTP("login", mOtpJsonObject, this)
+                       /*  mOtpJsonObject.addProperty("phoneNumber", response.data?.phoneNumber)
+                        mOtpJsonObject.addProperty("countryCode", response.data?.countryCode)*/
                         SharedPrefClass().putObject(
                             MyApplication.instance,
                             GlobalConstants.ACCESS_TOKEN,
@@ -107,11 +108,11 @@ class SignupActivity : BaseActivity() {
                             GlobalConstants.USERNAME,
                             activitySignupbinding.edtFirstName.text.toString() + " " + activitySignupbinding.edtLastName.text.toString()
                         )
-                        val mJsonObject = JsonObject()
+                       /* val mJsonObject = JsonObject()
                         mJsonObject.addProperty("userId", loginResponse.data!!.id)
                         mJsonObject.addProperty("sessionToken", loginResponse.data!!.token)
-                        loginViewModel.callVerifyUserApi(mJsonObject)
-                        /*showToastSuccess(message)
+                        loginViewModel.callVerifyUserApi(mJsonObject)*/
+                       /* showToastSuccess(message)
                         val intent = Intent(this, OTPVerificationActivity::class.java)
                         startActivity(intent)
                         finish()*/
