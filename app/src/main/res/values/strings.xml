@@ -3,11 +3,16 @@
     <string name="app_name">&app_name;</string>
     <string name="facebook_app_id">630169387861716</string>
     <string name="fb_login_protocol_scheme">fb630169387861716</string>
+    <string name="maps_api_key">AIzaSyDBBLtvW2kqoNiPXOuDBzlk5V_QmRXJLKg</string>
 
     <string name="internal_server_error">Internal server error, so please try after some time!</string>
     <string name="internet_connection">Please check your internet connection and try after some time!</string>
     <string name="sorry_text">Sorry we couldn\'t find any matches</string>
     <string name="please_wait">Please wait…</string>
+    <string name="cancellation_charges">Cancellation Charges: </string>
+    <string name="cancel_reason">Please specify for withdrawing the order</string>
+    <string name="enter_reason">Enter reason...</string>
+    <string name="send">Send</string>
     <string name="dummy">dummy</string>
     <string name="title_notifications">Notifications</string>
     <string name="email_c">E-MAIL</string>

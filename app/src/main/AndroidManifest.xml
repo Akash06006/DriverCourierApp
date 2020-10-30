@@ -39,7 +39,8 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="n">
-        <activity android:name=".views.authentication.DocumentVerificatonActivity"></activity>
+        <activity android:name=".views.orders.OrderDetailsActivity"></activity>
+        <activity android:name=".views.authentication.DocumentVerificatonActivity" />
         <activity android:name=".views.tutorials.TutorialActivity" />
         <activity android:name=".views.home.LandingActivty" />
         <activity
@@ -126,6 +127,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/fileprovider" />
         </provider>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/maps_api_key" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

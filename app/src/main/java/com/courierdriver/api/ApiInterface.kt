@@ -1,5 +1,6 @@
 package com.courierdriver.api
 
+import com.courierdriver.model.order.CreateOrdersInput
 import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -55,6 +56,41 @@ interface ApiInterface {
 
     @POST("auth/logout/")
     fun callLogout(@Body mJsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("mobile/orders/priceCalc")
+    fun calculatePrice(@Body jsonObject : JsonObject) : Call<JsonObject>
+
+    @GET("delivery/orders/cancelReasons")
+    fun cancelReason() : Call<JsonObject>
+
+    @POST("mobile/orders/create")
+    fun createOrder(@Body jsonObject : CreateOrdersInput?) : Call<JsonObject>
+
+    @GET("mobile/orders/transactionHistory")
+    fun getTansactionHistory() : Call<JsonObject>
+
+    @GET("mobile/orders/list")
+    fun getOrderList(@Query("orderStatus") orderStatus : String?) : Call<JsonObject>
+
+    @POST("mobile/orders/paymentStatus")
+    fun updatePaymentSuccess(@Body mJsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("mobile/coupan/applyCoupan")
+    fun applyCoupon(@Body jsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("mobile/coupan/removeCoupan")
+    fun removeCoupon(@Body jsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("delivery/orders/cancel")
+    fun cancelOrder(@Body jsonObject : JsonObject) : Call<JsonObject>
+
+    @GET("https://maps.googleapis.com/maps/api/distancematrix/json")
+    fun getDistanceInfo(
+        @QueryMap parameters : HashMap<String?, String?>
+    ) : Call<JsonObject>?
+
+    @GET("delivery/orders/detail/{id}")
+    fun orderDetail(@Path("id") slotId : String?) : Call<JsonObject>
 
     @GET("outlet-services/")
     fun getHomeList(@Query("page") page : String, @Query("limit") limit : String, @Query("companyId") companyId : String) : Call<JsonObject>
