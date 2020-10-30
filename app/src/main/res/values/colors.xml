@@ -28,6 +28,8 @@
     <color name="colorButtonBack">#FFCA3C</color>
     <color name="colorForgotPassword">#4D37B3</color>
     <color name="colorTabsRed">#D84D6B</color>
+    <color name="colorHomeTabRed">#DB5E79</color>
+    <color name="colorBlackHome">#435E55</color>
 
     <color name="tabColor">#989393</color>
 
