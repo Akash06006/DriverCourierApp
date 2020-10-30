@@ -137,4 +137,12 @@ interface ApiInterface {
     @POST("outlet-group-services-by-date/")
     fun getClassesListByDate(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
+    @GET("delivery/orders/list")
+    fun orderList(@Query("orderStatus") orderStatus : String, @Query("driverLat") driverLat : String, @Query("driverLong") driverLong  : String) : Call<JsonObject>
+
+    @POST("delivery/orders/acceptOrder")
+    fun acceptOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
+
+    @GET("delivery/orders/cancelReq")
+    fun cancelRequests(@Body mJsonObject : JsonObject) : Call<JsonObject>
 }

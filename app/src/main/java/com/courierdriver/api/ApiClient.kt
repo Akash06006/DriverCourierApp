@@ -6,8 +6,9 @@ package com.courierdriver.api
 
 
 import android.content.Intent
-import androidx.annotation.NonNull
 import android.text.TextUtils
+import android.util.Log
+import androidx.annotation.NonNull
 import com.courierdriver.application.MyApplication
 import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.constants.GlobalConstants
@@ -25,6 +26,7 @@ object ApiClient {
     @JvmStatic
     private val BASE_URL = GlobalConstants.BASE_URL
     private val sharedPrefClass = SharedPrefClass()
+
     @JvmStatic
     private var mApiInterface: ApiInterface? = null
 
@@ -42,27 +44,25 @@ object ApiClient {
         var mAuthToken = GlobalConstants.SESSION_TOKEN
 
 
-            if (mAuthToken == "session_token" && UtilsFunctions.checkObjectNull(
-                    SharedPrefClass().getPrefValue(
-                        MyApplication.instance.applicationContext,
-                        GlobalConstants.ACCESS_TOKEN
-                    )
+        if (mAuthToken == "session_token" && UtilsFunctions.checkObjectNull(
+                SharedPrefClass().getPrefValue(
+                    MyApplication.instance.applicationContext,
+                    GlobalConstants.ACCESS_TOKEN
                 )
             )
-            {
+        ) {
 
-                mAuthToken = sharedPrefClass.getPrefValue(
-                    MyApplication.instance,
-                    GlobalConstants.ACCESS_TOKEN
-                ).toString()
+            mAuthToken = sharedPrefClass.getPrefValue(
+                MyApplication.instance,
+                GlobalConstants.ACCESS_TOKEN
+            ).toString()
         }
 
 
-
         val httpClient = OkHttpClient.Builder()
-            //.connectTimeout(1, TimeUnit.MINUTES)
-           // .readTimeout(1, TimeUnit.MINUTES)
-           // .writeTimeout(1, TimeUnit.MINUTES)
+        //.connectTimeout(1, TimeUnit.MINUTES)
+        // .readTimeout(1, TimeUnit.MINUTES)
+        // .writeTimeout(1, TimeUnit.MINUTES)
 
         val mBuilder = Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -72,37 +72,33 @@ object ApiClient {
         if (!TextUtils.isEmpty(mAuthToken)) {
 
 
-
-            if(mAuthToken.length>20)
-            {
-                mAuthToken= "Bearer $mAuthToken"
+            if (mAuthToken.length > 20) {
+                mAuthToken = "Bearer $mAuthToken"
             }
 
 
             val finalMAuthToken = mAuthToken
 
-
-
-
-
+            Log.d("Token=---- ", "token=---- $finalMAuthToken")
             val interceptor: Interceptor = object : Interceptor {
                 @Throws(IOException::class)
                 override fun intercept(@NonNull chain: Interceptor.Chain): Response {
                     val original = chain.request()
                     val builder = original.newBuilder()
                         .header("Authorization", finalMAuthToken)
-                        .header("companyId", "25cbf58b-46ba-4ba2-b25d-8f8f653e9f11")
+                        .header("companyId", "c")
                         .header("lang", lang)
                     val request = builder.build()
                     val response = chain.proceed(request)
                     return if (response.code() == 401) {
-                        val i = Intent(MyApplication.instance.applicationContext, LoginActivity::class.java)
+                        val i = Intent(
+                            MyApplication.instance.applicationContext,
+                            LoginActivity::class.java
+                        )
                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         MyApplication.instance.applicationContext.startActivity(i)
                         response
-                    }
-
-                    else response
+                    } else response
                 }
             }
 

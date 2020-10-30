@@ -5,82 +5,285 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.PorterDuff
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
-import android.widget.Toast
 import android.provider.Settings
+import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.bumptech.glide.Glide
-import com.courierdriver.databinding.FragmentHomeBinding
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.courierdriver.R
+import com.courierdriver.adapters.orders.HomeOrdersAdapter
+import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.constants.GlobalConstants
+import com.courierdriver.databinding.FragmentHomeBinding
 import com.courierdriver.maps.FusedLocationClass
+import com.courierdriver.model.CommonModel
+import com.courierdriver.model.order.OrderListModel
 import com.courierdriver.sharedpreference.SharedPrefClass
 import com.courierdriver.utils.BaseFragment
 import com.courierdriver.viewmodels.home.HomeViewModel
-import com.courierdriver.views.orders.CreateOrderActivty
 import com.google.android.gms.location.*
 
 class
 HomeFragment : BaseFragment() {
-    private var mFusedLocationClass : FusedLocationClass? = null
-    private lateinit var homeViewModel : HomeViewModel
+    private var mFusedLocationClass: FusedLocationClass? = null
+    private lateinit var homeViewModel: HomeViewModel
     val PERMISSION_ID = 42
-    lateinit var mFusedLocationClient : FusedLocationProviderClient
+    lateinit var mFusedLocationClient: FusedLocationProviderClient
     var currentLat = ""
     var currentLong = ""
-    private lateinit var fragmentHomeBinding : FragmentHomeBinding
-    //var categoriesList = null
-    override fun getLayoutResId() : Int {
-        return R.layout.fragment_home
-    }
+    private lateinit var fragmentHomeBinding: FragmentHomeBinding
+    private var orderList: ArrayList<OrderListModel.Body>? = null
+    private var homeOrdersAdapter: HomeOrdersAdapter? = null
+    private var orderStatus = 1
 
-    override fun onResume() {
-        super.onResume()
-
-    }
-
-    //api/mobile/services/getSubcat/b21a7c8f-078f-4323-b914-8f59054c4467
     override fun initView() {
         fragmentHomeBinding = viewDataBinding as FragmentHomeBinding
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         fragmentHomeBinding.homeViewModel = homeViewModel
-        // categoriesList=List<Service>()
         mFusedLocationClass = FusedLocationClass(activity)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
-        // initRecyclerView()
-        val name = SharedPrefClass().getPrefValue(activity!!, GlobalConstants.USERNAME).toString()
-        fragmentHomeBinding.txtWelcome.setText("Welcome, " + name)
-        val userImage =
-            SharedPrefClass().getPrefValue(activity!!, GlobalConstants.USER_IMAGE).toString()
 
-        fragmentHomeBinding.toolbarCommon.toolbar.setImageResource(R.drawable.ic_side_menu)
+        sharedPrefValue()
+        setToolbarTextIcons()
+        viewClicks()
 
-        Glide.with(activity!!).load(userImage).placeholder(R.drawable.ic_user)
-            .into(fragmentHomeBinding.toolbarCommon.imgRight)
+        getOrderList(1)
+        getOrderListObserver()
+        acceptOrderObserver()
+        cancelOrderObserver()
+    }
+
+    private fun viewClicks() {
         homeViewModel.isClick().observe(
             this, Observer<String>(function =
-            fun(it : String?) {
+            fun(it: String?) {
                 when (it) {
-                    "txtCreateOrder" -> {
-                        val intent = Intent(activity, CreateOrderActivty::class.java)
-                        startActivity(intent)
+                    "tv_available" -> {
+                        clearList()
+                        orderStatus = 1
+
+                        fragmentHomeBinding.tvAvailable.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorRed),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvAvailable.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorWhite
+                            )
+                        )
+                        fragmentHomeBinding.tvActive.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorWhite),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvActive.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorBlack
+                            )
+                        )
+                        fragmentHomeBinding.tvCompleted.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorWhite),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvCompleted.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorBlack
+                            )
+                        )
+                        getOrderList(1)
+                    }
+                    "tv_active" -> {
+                        clearList()
+                        orderStatus = 2
+                        fragmentHomeBinding.tvActive.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorRed),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvActive.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorWhite
+                            )
+                        )
+                        fragmentHomeBinding.tvAvailable.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorWhite),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvAvailable.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorBlack
+                            )
+                        )
+                        fragmentHomeBinding.tvCompleted.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorWhite),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvCompleted.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorBlack
+                            )
+                        )
+                        getOrderList(2)
+                    }
+                    "tv_completed" -> {
+                        clearList()
+                        orderStatus = 3
+
+                        fragmentHomeBinding.tvCompleted.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorRed),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvCompleted.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorWhite
+                            )
+                        )
+                        fragmentHomeBinding.tvActive.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorWhite),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvActive.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorBlack
+                            )
+                        )
+                        fragmentHomeBinding.tvAvailable.background.setColorFilter(
+                            ContextCompat.getColor(baseActivity, R.color.colorWhite),
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                        fragmentHomeBinding.tvAvailable.setTextColor(
+                            ContextCompat.getColor(
+                                baseActivity,
+                                R.color.colorBlack
+                            )
+                        )
+                        getOrderList(3)
                     }
                 }
             })
         )
+    }
 
+    private fun clearList() {
+        if (orderList != null)
+            orderList!!.clear()
+        if (homeOrdersAdapter != null)
+            homeOrdersAdapter!!.notifyDataSetChanged()
+    }
+
+
+    //region API_CALL
+    fun getOrderList(orderStatus:Int) {
+        homeViewModel.orderList(orderStatus.toString(), "0.0", "0.0")
+    }
+
+    fun acceptOrder(id: String?) {
+        homeViewModel.acceptOrder(id!!)
+    }
+
+    fun cancelOrder(id: String?) {
+        homeViewModel.cancelOrder(id!!)
+    }
+    //endregion
+
+
+    //region Observers
+    private fun getOrderListObserver() {
+        homeViewModel.getOrderListData().observe(this,
+            Observer<OrderListModel> { response ->
+                if (response != null) {
+                    val message = response.message
+                    when (response.code) {
+                        200 -> {
+                            if (response.body!!.isNotEmpty()) {
+                                orderList = response.body
+                                setAdapter()
+                            }
+                        }
+                        else -> UtilsFunctions.showToastError(message!!)
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
+    }
+
+    private fun acceptOrderObserver() {
+        homeViewModel.acceptOrderData().observe(this,
+            Observer<CommonModel> { response ->
+                if (response != null) {
+                    val message = response.message
+                    when (response.code) {
+                        200 -> {
+                            UtilsFunctions.showToastSuccess(message!!)
+                        }
+                        else -> UtilsFunctions.showToastError(message!!)
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
+    }
+
+    private fun cancelOrderObserver() {
+        homeViewModel.cancelOrderData().observe(this,
+            Observer<CommonModel> { response ->
+                if (response != null) {
+                    val message = response.message
+                    when (response.code) {
+                        200 -> {
+                            UtilsFunctions.showToastSuccess(message!!)
+                        }
+                        else -> UtilsFunctions.showToastError(message!!)
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
+    }
+    //endregion
+
+    private fun setAdapter() {
+        val linearLayoutManager = LinearLayoutManager(baseActivity)
+        homeOrdersAdapter = HomeOrdersAdapter(this, orderList!!, orderStatus)
+        linearLayoutManager.orientation = RecyclerView.VERTICAL
+        fragmentHomeBinding.rvOrderList.layoutManager = linearLayoutManager
+        fragmentHomeBinding.rvOrderList.adapter = homeOrdersAdapter
+    }
+
+    private fun sharedPrefValue() {
+        val name =
+            SharedPrefClass().getPrefValue(activity!!, GlobalConstants.USERNAME).toString()
+        val userImage =
+            SharedPrefClass().getPrefValue(activity!!, GlobalConstants.USER_IMAGE)
+                .toString()
+    }
+
+    private fun setToolbarTextIcons() {
+        fragmentHomeBinding.toolbarCommon.toolbar.setImageResource(R.drawable.ic_back_white)
+        fragmentHomeBinding.toolbarCommon.imgRight.visibility = View.GONE
     }
 
     @SuppressLint("MissingPermission")
     private fun getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
-                mFusedLocationClient.lastLocation.addOnCompleteListener(activity!!) { task->
-                    var location : Location? = task.result
+                mFusedLocationClient.lastLocation.addOnCompleteListener(activity!!) { task ->
+                    var location: Location? = task.result
                     if (location == null) {
                         requestNewLocationData()
                     } else {
@@ -102,7 +305,7 @@ HomeFragment : BaseFragment() {
         }
     }
 
-    private fun checkPermissions() : Boolean {
+    private fun checkPermissions(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 activity!!,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -128,8 +331,8 @@ HomeFragment : BaseFragment() {
         )
     }
 
-    private fun isLocationEnabled() : Boolean {
-        var locationManager : LocationManager =
+    private fun isLocationEnabled(): Boolean {
+        var locationManager: LocationManager =
             activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
@@ -152,9 +355,10 @@ HomeFragment : BaseFragment() {
 
     }
 
-    private val mLocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult : LocationResult) {
-            var mLastLocation : Location = locationResult.lastLocation
+    private
+    val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            var mLastLocation: Location = locationResult.lastLocation
             currentLat = mLastLocation.latitude.toString()
             currentLong = mLastLocation.longitude.toString()
             /*Handler().postDelayed({
@@ -164,4 +368,7 @@ HomeFragment : BaseFragment() {
         }
     }
 
+    override fun getLayoutResId(): Int {
+        return R.layout.fragment_home
+    }
 }
