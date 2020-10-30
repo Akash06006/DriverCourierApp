@@ -28,8 +28,8 @@
             android:id="@+id/card_view_tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/dp_20"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentBottom="true"
+            app:cardCornerRadius="@dimen/dp_20">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tablayout"
@@ -38,37 +38,49 @@
                 android:layout_alignParentBottom="true"
                 android:visibility="visible"
                 app:tabBackground="@color/colorTabsRed"
-                app:tabIndicatorColor="@color/colorTabsRed"
+                app:tabIconTint="@color/colorWhite"
+                app:tabIndicator="@drawable/ic_tab_selector"
+                app:tabIndicatorGravity="top"
                 app:tabSelectedTextColor="@color/colorWhite"
                 app:tabTextAppearance="@style/customizeTabText"
-                app:tabIconTint="@color/colorWhite"
                 app:tabTextColor="@color/colorWhite">
 
+
+                <!--  <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+
+                      <ImageView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:src="@drawable/ic_tab_selector" />
+  -->
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:icon="@drawable/ic_tab_order"
-                    android:text="Orders" />
-                <!---->
+                    android:text="@string/orders" />
+                <!--                </LinearLayout>-->
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_tab_create"
-                    android:text="Create Order" />
-                <!-- android:icon="@drawable/ic_booking_tab"-->
+                    android:icon="@drawable/ic_tab_profile"
+                    android:text="@string/profile" />
+
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_tab_notification"
-                    android:text="Notification" />
-                <!-- android:icon="@drawable/ic_wallet_tab"-->
+                    android:icon="@drawable/ic_tab_message"
+                    android:text="@string/message" />
+
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:icon="@drawable/ic_tab_user"
-                    android:text="Profile" />
-                <!-- android:icon="@drawable/ic_profile_tab"-->
+                    android:icon="@drawable/ic_tab_available"
+                    android:text="@string/available" />
+
             </com.google.android.material.tabs.TabLayout>
         </androidx.cardview.widget.CardView>
 
