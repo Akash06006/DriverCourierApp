@@ -35,23 +35,13 @@ class LandingActivty : BaseActivity() {
                         fragment = HomeFragment()
                     }
                     1 -> {
-                        /* activityOtpVerificationBinding!!.toolbarCommon.imgToolbarText.setText(
-                             resources.getString(
-                                 R.string.my_booking
-                             )
-                         )*/
-                        // fragment = OrdersListFragment()
+                        fragment = ProfileFragment()
                     }
                     2 -> {
                         showToastSuccess("Coming Soon")
                     }
                     3 -> {
-                        /*  activityOtpVerificationBinding!!.toolbarCommon.imgToolbarText.setText(
-                              resources.getString(
-                                  R.string.profile
-                              )
-                          )*/
-                        fragment = ProfileFragment()
+                        showToastSuccess("Coming Soon")
                     }
                 }
                 callFragments(fragment, supportFragmentManager, false, "send_data", "")
