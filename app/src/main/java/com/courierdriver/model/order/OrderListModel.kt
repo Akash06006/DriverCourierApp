@@ -18,7 +18,7 @@ class OrderListModel {
         val pickupAddress: PickupAddress? = null
 
         @SerializedName("deliveryAddress")
-        val deliveryAddress: List<DeliveryAddress>? = null
+        val deliveryAddress: ArrayList<DeliveryAddress>? = null
 
         @SerializedName("orderNo")
         val orderNo: String? = null

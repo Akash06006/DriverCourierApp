@@ -43,6 +43,7 @@ HomeFragment : BaseFragment() {
     private var orderList: ArrayList<OrderListModel.Body>? = null
     private var homeOrdersAdapter: HomeOrdersAdapter? = null
     private var orderStatus = 1
+    private var adapterPosition = 0
 
     override fun initView() {
         fragmentHomeBinding = viewDataBinding as FragmentHomeBinding
@@ -71,7 +72,7 @@ HomeFragment : BaseFragment() {
                         orderStatus = 1
 
                         fragmentHomeBinding.tvAvailable.background.setColorFilter(
-                            ContextCompat.getColor(baseActivity, R.color.colorRed),
+                            ContextCompat.getColor(baseActivity, R.color.colorHomeTabRed),
                             PorterDuff.Mode.SRC_ATOP
                         )
                         fragmentHomeBinding.tvAvailable.setTextColor(
@@ -106,7 +107,7 @@ HomeFragment : BaseFragment() {
                         clearList()
                         orderStatus = 2
                         fragmentHomeBinding.tvActive.background.setColorFilter(
-                            ContextCompat.getColor(baseActivity, R.color.colorRed),
+                            ContextCompat.getColor(baseActivity, R.color.colorHomeTabRed),
                             PorterDuff.Mode.SRC_ATOP
                         )
                         fragmentHomeBinding.tvActive.setTextColor(
@@ -142,7 +143,7 @@ HomeFragment : BaseFragment() {
                         orderStatus = 3
 
                         fragmentHomeBinding.tvCompleted.background.setColorFilter(
-                            ContextCompat.getColor(baseActivity, R.color.colorRed),
+                            ContextCompat.getColor(baseActivity, R.color.colorHomeTabRed),
                             PorterDuff.Mode.SRC_ATOP
                         )
                         fragmentHomeBinding.tvCompleted.setTextColor(
@@ -187,7 +188,7 @@ HomeFragment : BaseFragment() {
 
 
     //region API_CALL
-    fun getOrderList(orderStatus:Int) {
+    fun getOrderList(orderStatus: Int) {
         homeViewModel.orderList(orderStatus.toString(), "0.0", "0.0")
     }
 
@@ -276,6 +277,7 @@ HomeFragment : BaseFragment() {
     private fun setToolbarTextIcons() {
         fragmentHomeBinding.toolbarCommon.toolbar.setImageResource(R.drawable.ic_back_white)
         fragmentHomeBinding.toolbarCommon.imgRight.visibility = View.GONE
+        fragmentHomeBinding.toolbarCommon.imgToolbarText.text = getString(R.string.home)
     }
 
     @SuppressLint("MissingPermission")
