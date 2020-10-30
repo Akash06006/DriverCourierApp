@@ -259,8 +259,15 @@
     <string name="place_image_here">Upload from gallery</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="key_phone">phone_number</string>
+    <string name="active">Active</string>
+    <string name="available">Available</string>
 
     <string name="key_country_code">country_code</string>
+    <string name="pickup_address">Pickup Address</string>
+    <string name="delivery_address">Delivery Address</string>
+    <string name="delivery_options">Delivery Options</string>
+    <string name="value">Value</string>
+    <string name="take_order">Take Order</string>
 
 
     <string-array name="Languages">

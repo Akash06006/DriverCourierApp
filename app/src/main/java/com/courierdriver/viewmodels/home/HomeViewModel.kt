@@ -5,53 +5,72 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.model.CommonModel
+import com.courierdriver.model.order.OrderListModel
 import com.courierdriver.viewmodels.BaseViewModel
 import com.example.services.repositories.home.HomeRepository
+import com.google.gson.JsonObject
 
 class HomeViewModel : BaseViewModel() {
     private val mIsUpdating = MutableLiveData<Boolean>()
     private val isClick = MutableLiveData<String>()
     private var homeRepository = HomeRepository()
-    private var clearCart = MutableLiveData<CommonModel>()
-    /*private var jobsHistoryResponse = MutableLiveData<JobsResponse>()
-    private var acceptRejectJob = MutableLiveData<CommonModel>()
-    private var startCompleteJob = MutableLiveData<CommonModel>()*/
+    private var getOrderList: MutableLiveData<OrderListModel>? = MutableLiveData()
+    private var acceptOrderList: MutableLiveData<CommonModel>? = MutableLiveData()
+    private var cancelOrderList: MutableLiveData<CommonModel>? = MutableLiveData()
 
     init {
-        if (UtilsFunctions.isNetworkConnectedReturn()) {
-            /* categoriesList = homeRepository.getCategories("")
-             subServicesList = homeRepository.getSubServices("")
-             clearCart = homeRepository.clearCart("")*/
+        getOrderList = homeRepository.getOrderList(null, null, null, getOrderList)
+        acceptOrderList = homeRepository.acceptOrder(null, acceptOrderList)
+        cancelOrderList = homeRepository.cancelOrder(null, cancelOrderList)
+    }
+
+    fun orderList(orderStatus: String, driverLat: String, driverLong: String) {
+        if (UtilsFunctions.isNetworkConnected()) {
+            getOrderList =
+                homeRepository.getOrderList(orderStatus, driverLat, driverLong, getOrderList)
+            mIsUpdating.postValue(true)
         }
-
     }
 
-    /*
-
-   fun getGetSubServices(): LiveData<CategoriesListResponse> {
-       return subServicesList
-   }*/
-    fun getClearCartRes() : LiveData<CommonModel> {
-        return clearCart
+    fun getOrderListData(): LiveData<OrderListModel> {
+        return getOrderList!!
     }
 
-    override fun isLoading() : LiveData<Boolean> {
+    fun acceptOrder(id: String) {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("id", id)
+            acceptOrderList = homeRepository.acceptOrder(jsonObject, acceptOrderList)
+            mIsUpdating.postValue(true)
+        }
+    }
+
+    fun acceptOrderData(): LiveData<CommonModel> {
+        return acceptOrderList!!
+    }
+
+    fun cancelOrder(id: String) {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("id", id)
+            cancelOrderList = homeRepository.cancelOrder(jsonObject, cancelOrderList)
+            mIsUpdating.postValue(true)
+        }
+    }
+
+    fun cancelOrderData(): LiveData<CommonModel> {
+        return cancelOrderList!!
+    }
+
+    override fun isLoading(): LiveData<Boolean> {
         return mIsUpdating
     }
 
-    override fun isClick() : LiveData<String> {
+    override fun isClick(): LiveData<String> {
         return isClick
     }
 
-    override fun clickListener(v : View) {
+    override fun clickListener(v: View) {
         isClick.value = v.resources.getResourceName(v.id).split("/")[1]
     }
-    /* fun getSubServices(mJsonObject: String) {
-         if (UtilsFunctions.isNetworkConnected()) {
-             subServicesList = homeRepository.getSubServices(mJsonObject)
-             mIsUpdating.postValue(true)
-         }
-
-     }*/
-
 }
