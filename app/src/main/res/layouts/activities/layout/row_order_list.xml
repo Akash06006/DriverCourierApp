@@ -236,7 +236,7 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/tv_active_take_order"
+                            android:id="@+id/tv_take_order"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/dp_10"
@@ -255,7 +255,7 @@
                             app:font="@{`bold`}" />
 
                         <TextView
-                            android:id="@+id/tv_active_cancel_order"
+                            android:id="@+id/tv_cancel_order"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/dp_10"
@@ -277,51 +277,5 @@
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
-        <LinearLayout
-            android:id="@+id/lin_available_order"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tv_available_take_order"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/dp_10"
-                android:layout_marginRight="@dimen/dp_10"
-                android:background="@drawable/round_corners_home_tab"
-                android:backgroundTint="@color/colorHomeTabRed"
-                android:padding="@dimen/dp_10"
-                android:paddingLeft="@dimen/dp_20"
-                android:paddingTop="@dimen/dp_10"
-                android:paddingRight="@dimen/dp_20"
-                android:paddingBottom="@dimen/dp_10"
-                android:text="@string/take_order"
-                android:textAlignment="center"
-                android:textColor="@color/colorWhite"
-                android:textSize="@dimen/sp_14"
-                app:font="@{`bold`}" />
-
-            <TextView
-                android:id="@+id/tv_available_cancel_order"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/dp_10"
-                android:layout_marginRight="@dimen/dp_10"
-                android:background="@drawable/round_corners_home_tab"
-                android:backgroundTint="@color/colorGreyLight"
-                android:paddingLeft="@dimen/dp_20"
-                android:paddingTop="@dimen/dp_10"
-                android:paddingRight="@dimen/dp_20"
-                android:paddingBottom="@dimen/dp_10"
-                android:text="@string/cancel"
-                android:textAlignment="center"
-                android:textColor="@color/colorBlack"
-                android:textSize="@dimen/sp_14"
-                app:font="@{`bold`}" />
-
-        </LinearLayout>
     </LinearLayout>
 </layout>

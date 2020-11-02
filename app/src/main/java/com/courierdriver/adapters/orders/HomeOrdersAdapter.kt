@@ -42,19 +42,18 @@ class HomeOrdersAdapter(
     private fun setOrderButtons(binding: RowOrderListBinding) {
         when (orderStatus) {
             1 -> {
-                binding.linAvailableOrder.visibility = View.VISIBLE
-                binding.linActiveOrder.visibility = View.GONE
+                binding.tvTakeOrder.text = mContext.getString(R.string.accept)
+                binding.linActiveOrder.visibility = View.VISIBLE
                 binding.relRoute.visibility = View.VISIBLE
                 binding.viewRoute.visibility = View.VISIBLE
             }
             2 -> {
-                binding.linAvailableOrder.visibility = View.GONE
+                binding.tvTakeOrder.text = mContext.getString(R.string.take_order)
                 binding.linActiveOrder.visibility = View.VISIBLE
                 binding.relRoute.visibility = View.VISIBLE
                 binding.viewRoute.visibility = View.VISIBLE
             }
             3 -> {
-                binding.linAvailableOrder.visibility = View.GONE
                 binding.linActiveOrder.visibility = View.GONE
                 binding.relRoute.visibility = View.GONE
                 binding.viewRoute.visibility = View.GONE
@@ -87,17 +86,11 @@ class HomeOrdersAdapter(
     ) : RecyclerView.ViewHolder(v) {
         init {
 
-            binding!!.tvAvailableTakeOrder.setOnClickListener {
-                mContext.acceptOrder(orderList!![adapterPosition].id)
+            binding!!.tvTakeOrder.setOnClickListener {
+                mContext.acceptOrder(orderList!![adapterPosition].id, adapterPosition)
             }
-            binding!!.tvAvailableCancelOrder.setOnClickListener {
-                mContext.cancelOrder(orderList!![adapterPosition].id)
-            }
-            binding!!.tvActiveTakeOrder.setOnClickListener {
-                mContext.acceptOrder(orderList!![adapterPosition].id)
-            }
-            binding!!.tvActiveCancelOrder.setOnClickListener {
-                mContext.cancelOrder(orderList!![adapterPosition].id)
+            binding.tvCancelOrder.setOnClickListener {
+                mContext.cancelOrder(orderList!![adapterPosition].id, adapterPosition)
             }
         }
     }

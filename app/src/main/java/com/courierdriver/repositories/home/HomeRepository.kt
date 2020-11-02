@@ -7,6 +7,7 @@ import com.courierdriver.api.ApiResponse
 import com.courierdriver.api.ApiService
 import com.courierdriver.application.MyApplication
 import com.courierdriver.common.UtilsFunctions
+import com.courierdriver.model.CancelReasonModel
 import com.courierdriver.model.CommonModel
 import com.courierdriver.model.order.OrderListModel
 import com.google.gson.GsonBuilder
@@ -91,9 +92,32 @@ class HomeRepository {
                         cancelOrderData!!.value = null
                         UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
                     }
-                }, ApiClient.getApiInterface().acceptOrder(jsonObject)
+                }, ApiClient.getApiInterface().cancelRequests(jsonObject)
             )
         }
         return cancelOrderData!!
+    }
+
+    fun cancellationReason(cancellationReasonData: MutableLiveData<CancelReasonModel>?): MutableLiveData<CancelReasonModel> {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val mApiService = ApiService<JsonObject>()
+            mApiService.get(
+                object : ApiResponse<JsonObject> {
+                    override fun onResponse(mResponse: Response<JsonObject>) {
+                        val data = gson.fromJson<CancelReasonModel>(
+                            "" + mResponse.body()!!,
+                            CancelReasonModel::class.java
+                        )
+                        cancellationReasonData!!.postValue(data)
+                    }
+
+                    override fun onError(mKey: String) {
+                        cancellationReasonData!!.value = null
+                        UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
+                    }
+                }, ApiClient.getApiInterface().cancelReasons()
+            )
+        }
+        return cancellationReasonData!!
     }
 }
