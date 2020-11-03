@@ -280,6 +280,17 @@
     <string name="pay_to_locomo">Pay To Locomo</string>
     <string name="value">Value</string>
     <string name="take_order">Take Order</string>
+    <string name="orders">Orders</string>
+    <string name="accept">Accept</string>
+    <string name="do_you_want_to_cancel_order">Do you really want to cancel order?</string>
+    <string name="cancel_order">Cancel Order</string>
+    <string name="cancellation_charges">Cancellation Charges</string>
+    <string name="select_reason">Select Reason</string>
+    <string name="enter_reason">Enter Reason</string>
+    <string name="please_select_reason">Please select reason</string>
+    <string name="select_region">Select Region</string>
+    <string name="where_you_live">Where you live?</string>
+    <string name="pickup_time">Pickup Time</string>
 
 
     <string-array name="Languages">
