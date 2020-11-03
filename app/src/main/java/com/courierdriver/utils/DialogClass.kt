@@ -19,6 +19,7 @@ import android.widget.*
 import android.widget.RatingBar.OnRatingBarChangeListener
 import com.courierdriver.R
 import com.courierdriver.callbacks.ChoiceCallBack
+import com.courierdriver.callbacks.SelfieCallBack
 
 class DialogClass {
     private var checkClick = 0
@@ -237,6 +238,43 @@ class DialogClass {
         }
 
 
+
+        dialogView.show()
+
+        return dialogView
+
+    }
+
+    fun setUploadSelfieConfirmationDialog(
+        mContext: Context,
+        mInterface: SelfieCallBack,
+        mKey: String
+    ): Dialog {
+        val dialogView = Dialog(mContext)
+        dialogView.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        val binding =
+            DataBindingUtil.inflate<ViewDataBinding>(
+                LayoutInflater.from(mContext),
+                R.layout.dialog_image_selfie,
+                null,
+                false
+            )
+
+        dialogView.setContentView(binding.root)
+        dialogView.setCancelable(true)
+        dialogView.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+        dialogView.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val camera = dialogView.findViewById<LinearLayout>(R.id.ll_camera)
+        val gallery = dialogView.findViewById<LinearLayout>(R.id.ll_gallery)
+        // Create the AlertDialog object and return it
+        camera.setOnClickListener {
+            mInterface.selfieFromCamera(mKey)
+            dialogView.dismiss()
+        }
+       /* gallery.setOnClickListener {
+            mInterface.photoFromGallery(mKey)
+            dialogView.dismiss()
+        }*/
 
         dialogView.show()
 

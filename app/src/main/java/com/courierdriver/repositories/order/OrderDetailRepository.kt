@@ -8,6 +8,7 @@ import com.courierdriver.api.ApiResponse
 import com.courierdriver.api.ApiService
 import com.courierdriver.application.MyApplication
 import com.courierdriver.common.UtilsFunctions
+import com.courierdriver.model.CancelReasonModel
 import com.courierdriver.model.CommonModel
 import com.courierdriver.model.LoginResponse
 import com.courierdriver.model.order.CreateOrdersInput
@@ -501,41 +502,32 @@ class OrderDetailRepository {
 
     }
 
-    fun cancelOrder(mJsonObject : JsonObject?) : MutableLiveData<CommonModel> {
-        if (mJsonObject != null) {
+    fun cancelOrder(
+        jsonObject: JsonObject?,
+        cancelOrderData: MutableLiveData<CommonModel>?
+    ): MutableLiveData<CommonModel> {
+        if (UtilsFunctions.isNetworkConnected() && jsonObject != null) {
             val mApiService = ApiService<JsonObject>()
             mApiService.get(
                 object : ApiResponse<JsonObject> {
-                    override fun onResponse(mResponse : Response<JsonObject>) {
-                        val loginResponse = if (mResponse.body() != null)
-                            gson.fromJson<CommonModel>(
-                                "" + mResponse.body(),
-                                CommonModel::class.java
-                            )
-                        else {
-                            gson.fromJson<CommonModel>(
-                                mResponse.errorBody()!!.charStream(),
-                                CommonModel::class.java
-                            )
-                        }
-
-
-                        cancelOrder!!.postValue(loginResponse)
-
+                    override fun onResponse(mResponse: Response<JsonObject>) {
+                        val data = gson.fromJson<CommonModel>(
+                            "" + mResponse.body()!!,
+                            CommonModel::class.java
+                        )
+                        cancelOrderData!!.postValue(data)
                     }
 
-                    override fun onError(mKey : String) {
+                    override fun onError(mKey: String) {
+                        cancelOrderData!!.value = null
                         UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
-                        cancelOrder!!.postValue(null)
-
                     }
-
-                }, ApiClient.getApiInterface().cancelOrder(mJsonObject)
+                }, ApiClient.getApiInterface().cancelRequests(jsonObject)
             )
         }
-        return cancelOrder!!
-
+        return cancelOrderData!!
     }
+
 
     fun orderDetail(orderId : String?) : MutableLiveData<OrdersDetailResponse> {
         if (!TextUtils.isEmpty(orderId)) {
@@ -640,6 +632,29 @@ class OrderDetailRepository {
         }
         return createOrder!!
 
+    }
+
+    fun cancellationReason(cancellationReasonData: MutableLiveData<CancelReasonModel>?): MutableLiveData<CancelReasonModel> {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val mApiService = ApiService<JsonObject>()
+            mApiService.get(
+                object : ApiResponse<JsonObject> {
+                    override fun onResponse(mResponse: Response<JsonObject>) {
+                        val data = gson.fromJson<CancelReasonModel>(
+                            "" + mResponse.body()!!,
+                            CancelReasonModel::class.java
+                        )
+                        cancellationReasonData!!.postValue(data)
+                    }
+
+                    override fun onError(mKey: String) {
+                        cancellationReasonData!!.value = null
+                        UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
+                    }
+                }, ApiClient.getApiInterface().cancelReasons()
+            )
+        }
+        return cancellationReasonData!!
     }
 
     fun updatePaymentStatus(mJsonObject : JsonObject?) : MutableLiveData<CommonModel> {

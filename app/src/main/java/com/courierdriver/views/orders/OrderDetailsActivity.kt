@@ -2,6 +2,7 @@ package com.courierdriver.views.orders
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -15,53 +16,68 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.provider.MediaStore
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.view.Window
+import android.view.*
 import android.widget.*
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.courierdriver.R
 import com.courierdriver.adapters.orders.DetailDeliveryAddressAdapter
+import com.courierdriver.callbacks.SelfieCallBack
 import com.courierdriver.utils.BaseActivity
 import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.constants.GlobalConstants
 import com.courierdriver.databinding.ActivityOrderDetailsBinding
 
 import  com.courierdriver.maps.FusedLocationClass
+import com.courierdriver.model.CancelReasonModel
 import  com.courierdriver.model.CommonModel
 import  com.courierdriver.model.order.ListsResponse
 import  com.courierdriver.model.order.OrdersDetailResponse
 import com.courierdriver.sharedpreference.SharedPrefClass
+import com.courierdriver.utils.DialogClass
+import com.courierdriver.utils.DialogssInterface
+import com.courierdriver.utils.RealPathUtil
 import com.courierdriver.viewmodels.order.OrderDetailViewModel
-import com.example.courier.model.order.CancelReasonsListResponse
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
-import com.google.gson.JsonObject
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
+import com.theartofdev.edmodo.cropper.CropImage
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
 
 class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListener,
     GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    GoogleMap.OnCameraIdleListener {
+    GoogleMap.OnCameraIdleListener, DialogssInterface,SelfieCallBack {
     private lateinit var activityCreateOrderBinding: ActivityOrderDetailsBinding
     private lateinit var orderViewModel: OrderDetailViewModel
+    private var selfieDialog: Dialog? = null
     var vehicleList = ArrayList<ListsResponse.VehicleData>()
-
+    private var cancellationReason: String? = null
+    var fileUri = ""
     // var bannersList = ArrayList<ListsResponse.BannersData>()
     var deliveryTypeList = ArrayList<ListsResponse.DeliveryOptionData>()
     var weightList = ArrayList<ListsResponse.WeightData>()
@@ -75,10 +91,16 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
     private var mGoogleApiClient: GoogleApiClient? = null
     private var click_settings = 1
     private var click_gps = 1
+    var imageFile: File? = null
     private var mHandler = Handler()
     private var mLatitude: String? = null
     private var mLongitude: String? = null
     private var scan = 0
+    private var cancelOrderAlertDialog: Dialog? = null
+    private var submitCancelReasonDialog: Dialog? = null
+    private var cancelStringReasonList = ArrayList<String?>()
+    private var cancelReasonList: ArrayList<CancelReasonModel.Body>? = ArrayList()
+    private var mDialogClass = DialogClass()
     private var start = 0
     private var permanent_deny = 0
     val MY_PERMISSIONS_REQUEST_LOCATION = 99
@@ -91,8 +113,11 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
     private var mLocation: Location? = null
     internal var cameraZoom = 16.0f
     private var mAddress = ""
+    var selfieImage = ""
     var orderId = ""
     var userId =""
+    private var photoFile: File? = null
+    private val CAMERA_REQUEST = 1808
     internal lateinit var mLastLocation: Location
     internal lateinit var mLocationCallback: LocationCallback
     internal var mCurrLocationMarker: Marker? = null
@@ -150,27 +175,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         } else {
             //  activityCreateOrderBinding.bottomButtons.visibility = View.GONE
         }
-        // Specify the types of place data to return.
-        orderViewModel.cancelReasonRes().observe(this,
-            Observer<CancelReasonsListResponse> { response ->
-                stopProgressDialog()
-
-                if (response != null) {
-                    val message = response.message
-                    when {
-                        response.code == 200 -> {
-                            for (count in 0 until response.data!!.size) {
-                                reasons.add(response.data!![count].reason!!)
-
-                            }
-                            //reasons.add("Other Reason")
-                            // activityCreateOrderBinding.orderDetailModel = response.data
-                        }
-                        else -> message?.let { UtilsFunctions.showToastError(it) }
-                    }
-                }
-            })
-
+        cancelReasonObserver()
         orderViewModel.cancelOrderRes().observe(this,
             Observer<CommonModel> { response ->
                 stopProgressDialog()
@@ -285,20 +290,19 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
             this, Observer<String>(function =
             fun(it: String?) {
                 when (it) {
-
                     "tv_complete_order" -> {
+                        showTakeSelfieAlert("complete_order")
                         orderViewModel.completeOrder(orderId, "")
                     }
                     "tv_accepted_cancel_order" -> {
-                    // Set the fields to specify which types of place data to
-                        showCancelReasonDialog()
+                        showCancelOrderAlert()
                     }
                     "tv_accepted_take_order" -> {
+                        showTakeSelfieAlert("take_order")
                         orderViewModel.pickupOrder(orderId)
                     }
                     "tv_available_cancel_order" -> {
-                    // Set the fields to specify which types of place data to
-                        showCancelReasonDialog()
+                        showCancelOrderAlert()
                     }
                     "tv_available_accept_order" -> {
                         orderViewModel.acceptOrder(orderId)
@@ -308,6 +312,53 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         )
 
     }
+
+    private fun cancelReasonObserver() {
+        orderViewModel.cancelReason()
+        orderViewModel.cancelReasonData().observe(this,
+            Observer<CancelReasonModel> { response ->
+                if (response != null) {
+                    when (response.code) {
+                        200 -> {
+                            if (response.body!!.isNotEmpty()) {
+                                cancelReasonList = response.body
+                            }
+                        }
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
+    }
+    private fun showCancelOrderAlert() {
+        cancelOrderAlertDialog = mDialogClass!!.setDefaultDialog(
+            this,
+            this,
+            "cancelOrderAlert",
+            getString(R.string.no),
+            getString(R.string.yes),
+            getString(R.string.do_you_want_to_cancel_order)
+        )
+        cancelOrderAlertDialog!!.show()
+    }
+
+    private fun showTakeSelfieAlert(orderStatus: String) {
+        if (checkAndRequestPermissions()) {
+            selfieDialog = mDialogClass.setUploadSelfieConfirmationDialog(
+                this,
+                this,orderStatus)
+        }
+    }
+
+    override fun onDialogConfirmAction(mView: View?, mKey: String) {
+        cancelOrderAlertDialog!!.dismiss()
+        showCancelReasonDialog()
+    }
+
+    override fun onDialogCancelAction(mView: View?, mKey: String) {
+        cancelOrderAlertDialog!!.dismiss()
+    }
+
 
     private fun hideUnhideButtons(data: OrdersDetailResponse.Data) {
         var orderStatus = data.orderStatus?.status // 1 available, 2 active, 3 completed
@@ -571,122 +622,91 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun showCancelReasonDialog() {
-        confirmationDialog = Dialog(this, R.style.transparent_dialog)
-        confirmationDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        submitCancelReasonDialog = Dialog(this)
+        submitCancelReasonDialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        val dialogBinding =
+            DataBindingUtil.inflate<ViewDataBinding>(
+                LayoutInflater.from(this),
+                R.layout.dialog_cancel_order_reason,
+                null,
+                false
+            )
+        submitCancelReasonDialog!!.setContentView(dialogBinding.root)
+        submitCancelReasonDialog!!.setCancelable(false)
 
+        val spinnerReason =
+            submitCancelReasonDialog!!.findViewById<Spinner>(R.id.sp_cancellation_reason)
+        val tvSubmit = submitCancelReasonDialog!!.findViewById<TextView>(R.id.tv_submit)
+        val tvCancel = submitCancelReasonDialog!!.findViewById<TextView>(R.id.tv_cancel)
+        val relOtherReason =
+            submitCancelReasonDialog!!.findViewById<RelativeLayout>(R.id.rel_other_reason)
+        val etOtherReason =
+            submitCancelReasonDialog!!.findViewById<EditText>(R.id.et_other_reason)
 
-        confirmationDialog?.setContentView(R.layout.cancel_dialog)
-        confirmationDialog?.setCancelable(true)
+        setCancelReasonSpinner(spinnerReason, relOtherReason)
 
-        confirmationDialog?.window!!.setLayout(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        confirmationDialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val edtReason = confirmationDialog?.findViewById<EditText>(R.id.edtReason)
-        val llCancelCharges = confirmationDialog?.findViewById<LinearLayout>(R.id.llCancelCharges)
-        val btnSend = confirmationDialog?.findViewById<Button>(R.id.btnSend)
-        val txtCharges = confirmationDialog?.findViewById<TextView>(R.id.txtCharges)
-        val spReason = confirmationDialog?.findViewById<Spinner>(R.id.spReason)
-        val adapter = ArrayAdapter(
-            this,
-            R.layout.spinner_item, reasons
-        )
-
-        adapter.setDropDownViewResource(R.layout.spinner_item);
-
-        if (!cancelledCharges.equals("0") || !TextUtils.isEmpty(cancelledCharges)) {
-            llCancelCharges?.visibility = View.VISIBLE
-            txtCharges?.text = cancelledCharges
-        } else {
-            llCancelCharges?.visibility = View.GONE
+        tvSubmit.setOnClickListener {
+            if (TextUtils.isEmpty(cancellationReason))
+                UtilsFunctions.showToastError(getString(R.string.please_select_reason))
+            else
+                cancelOrderApi(etOtherReason.text.toString())
+        }
+        tvCancel.setOnClickListener {
+            submitCancelReasonDialog!!.dismiss()
         }
 
-        spReason?.adapter = adapter
-        var pos = 0
-        var otherReason = "false"
-        spReason?.onItemSelectedListener = object :
+        submitCancelReasonDialog!!.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+        submitCancelReasonDialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        submitCancelReasonDialog!!.window!!.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        submitCancelReasonDialog!!.show()
+        }
+
+    private fun cancelOrderApi(otherReason: String) {
+        orderViewModel.cancelOrder(orderId!!, cancellationReason!!, otherReason)
+    }
+
+    private fun setCancelReasonSpinner(
+        spCancellationReason: Spinner,
+        relOtherReason: RelativeLayout
+    ) {
+        if (cancelStringReasonList.isNotEmpty())
+            cancelStringReasonList.clear()
+
+        for (item in 0 until cancelReasonList!!.size) {
+            cancelStringReasonList.add(cancelReasonList!![item].reason)
+        }
+        val adapter = ArrayAdapter<String>(this, R.layout.spinner_item)
+        adapter.add(getString(R.string.select_reason))
+        adapter.addAll(cancelStringReasonList)
+        adapter.setDropDownViewResource(R.layout.spinner_item)
+        spCancellationReason.adapter = adapter
+
+        spCancellationReason.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-                //if (position != 0) {
-                pos = position
-                edtReason?.setText("")
-                otherReason = "false"
-                if (reasons[pos].equals("Other")) {
-                    otherReason = "true"
-                    edtReason?.visibility = View.VISIBLE
+                if (position != 0) {
+                    cancellationReason = cancelReasonList!![position - 1].reason
+                    UtilsFunctions.showToastSuccess(cancellationReason!!)
+                    if (position == 1)
+                        relOtherReason.visibility = View.VISIBLE
+                    else
+                        relOtherReason.visibility = View.GONE
                 } else {
-                    otherReason = "false"
-                    edtReason?.visibility = View.GONE
+                    relOtherReason.visibility = View.GONE
+                    cancellationReason = null
                 }
-                /* } else {
-                     //regionId = "0"
-                     //regionPos = position
-                 }
- */
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
                 // write code to perform some action
             }
         }
-
-
-        btnSend?.setOnClickListener {
-            val mJsonObject = JsonObject()
-            mJsonObject.addProperty(
-                "orderId", orderId
-            )
-            if (otherReason.equals("true")) {
-                mJsonObject.addProperty(
-                    "cancellationReason",
-                    edtReason?.text.toString().trim() //completedorder?.empId
-                )
-                mJsonObject.addProperty(
-                    "otherReason", edtReason?.text.toString().trim()
-                )
-
-            } else {
-                mJsonObject.addProperty(
-                    "cancellationReason", reasons[pos]//completedorder?.empId
-                )
-                mJsonObject.addProperty(
-                    "otherReason", reasons[pos]
-                )
-            }
-            if (pos != 0) {
-                if (otherReason.equals("true")) {
-                    if (TextUtils.isEmpty(edtReason?.text.toString().trim())) {
-                        edtReason?.error = "Please enter reason"
-                    } else {
-                        if (UtilsFunctions.isNetworkConnected()) {
-                            startProgressDialog()
-                            orderViewModel.cancelOrder(mJsonObject)
-                            confirmationDialog?.dismiss()
-                        }
-                    }
-                } else {
-                    if (UtilsFunctions.isNetworkConnected()) {
-                        startProgressDialog()
-                        orderViewModel.cancelOrder(mJsonObject)
-                        confirmationDialog?.dismiss()
-                    }
-                }
-
-            } else {
-                UtilsFunctions.showToastError("Please select reason")
-            }
-        }
-        /*imgCross?.setOnClickListener {
-            confirmationDialog?.dismiss()
-        }*/
-        if (!confirmationDialog?.isShowing()!!) {
-            confirmationDialog?.show()
-        }
-
     }
 
     override fun onCameraIdle() {
@@ -806,32 +826,69 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         }
 
     }
-    /*fun bitmapDescriptorFromVector(
-        context : Context
-    ) : BitmapDescriptor {
-        val background = ContextCompat.getDrawable(context, R.drawable.ic_map_pin_filled_blue_48dp);
-        background?.setBounds(
-            0,
-            0,
-            background!!.getIntrinsicWidth(),
-            background.getIntrinsicHeight()
-        );
-        val vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
-        vectorDrawable?.setBounds(
-            40,
-            20,
-            vectorDrawable.getIntrinsicWidth() + 40,
-            vectorDrawable.getIntrinsicHeight() + 20
-        );
-        var bitmap = Bitmap.createBitmap(
-            background!!.getIntrinsicWidth(),
-            background.getIntrinsicHeight(),
-            Bitmap.Config.ARGB_8888
-        );
-        var canvas = Canvas(bitmap);
-        background?.draw(canvas);
-        vectorDrawable?.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }*/
+
+    override fun selfieFromCamera(mKey: String) {
+
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (intent.resolveActivity(this.getPackageManager()) == null) {
+                return
+            }
+            val fileName = "CAMERA_" + "img" + ".jpg"
+            //val photoFile = getTemporaryCameraFile(fileName)
+            photoFile = File(this.externalCacheDir, fileName)
+            val uri = UtilsFunctions.getValidUri(photoFile!!, this)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            startActivityForResult(intent, CAMERA_REQUEST)
+
+
+    }
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        //currentPhotoPath = File(baseActivity?.cacheDir, fileName)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            selfieImage = absolutePath
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data != null && data.data != null) {
+
+                CropImage.activity(data.data)
+                    .start(this);
+            } else {
+                if (photoFile != null) {
+                    val data1 = Intent()
+                    data1.data = UtilsFunctions.getValidUri(photoFile!!, this)
+                    CropImage.activity(data1.data)
+                        .start(this);
+                }
+            }
+
+
+        }else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            if (result != null) {
+                val resultUri = result.uri
+                fileUri = RealPathUtil.getRealPath(this, resultUri)!!
+                val file = File(fileUri)
+                imageFile = file
+               /* Glide.with(this).load(resultUri).placeholder(R.drawable.ic_user_image)
+                    .error(R.drawable.ic_user_image)
+                    .into(activityProfileBinding.imgProfile)*/
+                //hit upload api
+            }
+
+        }
+
+    }
 
 }

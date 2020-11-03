@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import android.view.View
 import com.courierdriver.common.UtilsFunctions
+import com.courierdriver.model.CancelReasonModel
 import com.courierdriver.model.CommonModel
 import com.courierdriver.model.LoginResponse
 import com.courierdriver.model.order.CreateOrdersInput
@@ -37,7 +38,9 @@ class OrderDetailViewModel : BaseViewModel() {
     private var pickupOrderResponse: MutableLiveData<CommonModel>? = MutableLiveData()
     private var cancelOrder = MutableLiveData<CommonModel>()
     private var profileDetail = MutableLiveData<LoginResponse>()
+    private var cancelOrderList: MutableLiveData<CommonModel>? = MutableLiveData()
     private var orderRepository = OrderDetailRepository()
+    private var cancelReasonList: MutableLiveData<CancelReasonModel>? = MutableLiveData()
     private val mIsUpdating = MutableLiveData<Boolean>()
     private val btnClick = MutableLiveData<String>()
 
@@ -57,6 +60,7 @@ class OrderDetailViewModel : BaseViewModel() {
             data = orderRepository.callDistanceApi(null)
             createOrder = orderRepository.createOrder(null)
             paymentStatus = orderRepository.updatePaymentStatus(null)
+            cancelReasonList = orderRepository.cancellationReason(cancelReasonList)
         }
 
     }
@@ -98,6 +102,10 @@ class OrderDetailViewModel : BaseViewModel() {
 
     fun cancelOrderRes() : LiveData<CommonModel> {
         return cancelOrder
+    }
+
+    fun cancelReasonData(): LiveData<CancelReasonModel> {
+        return cancelReasonList!!
     }
 
     fun orderDetailRes() : LiveData<OrdersDetailResponse> {
@@ -192,11 +200,18 @@ class OrderDetailViewModel : BaseViewModel() {
         }
     }
 
-    fun cancelOrder(mJsonObject : JsonObject) {
+    fun cancelOrder(
+        id: String,
+        cancellationReason: String,
+        otherReason: String
+    ) {
         if (UtilsFunctions.isNetworkConnected()) {
-            cancelOrder = orderRepository.cancelOrder(mJsonObject)
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("id", id)
+            jsonObject.addProperty("cancellationReason", cancellationReason)
+            jsonObject.addProperty("otherReason", otherReason)
+            cancelOrderList = orderRepository.cancelOrder(jsonObject, cancelOrderList)
             mIsUpdating.postValue(true)
-
         }
     }
 
@@ -216,11 +231,10 @@ class OrderDetailViewModel : BaseViewModel() {
         }
     }
 
-    fun cancelReason(orderStatus : String) {
+    fun cancelReason() {
         if (UtilsFunctions.isNetworkConnected()) {
-            cancelReason = orderRepository.cancelReason(orderStatus)
+            cancelReasonList = orderRepository.cancellationReason(cancelReasonList)
             mIsUpdating.postValue(true)
-
         }
     }
 

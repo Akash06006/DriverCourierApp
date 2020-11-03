@@ -325,7 +325,7 @@
                                         android:layout_marginTop="@dimen/dp_5"
                                         android:drawableLeft="@drawable/vehicle_type"
                                         android:drawablePadding="@dimen/dp_2"
-                                        android:text="@{orderDetailModel.vehicleType}"
+                                        android:text="@{orderDetailModel.vehicle.name}"
                                         android:textColor="@color/colorBlack"
                                         android:textSize="@dimen/sp_12"
                                         app:font="@{`semibold`}" />

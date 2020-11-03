@@ -249,7 +249,6 @@ HomeFragment : BaseFragment(), DialogssInterface {
         cancelOrderAlertDialog!!.dismiss()
     }
 
-
     private fun showCancelReasonSubmitDialog() {
         submitCancelReasonDialog = Dialog(baseActivity)
         submitCancelReasonDialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)

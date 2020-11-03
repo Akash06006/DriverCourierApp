@@ -94,7 +94,7 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:0.5'
 
     implementation 'com.google.maps:google-maps-services:0.2.5'
-
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'com.akexorcist:googledirectionlibrary:1.0.4'
     implementation 'com.google.android.libraries.places:places:2.4.0'
 

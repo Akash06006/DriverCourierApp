@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
@@ -19,8 +20,10 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import android.widget.Toast.LENGTH_SHORT
+import androidx.core.content.FileProvider
 import com.courierdriver.R
 import com.courierdriver.application.MyApplication
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,6 +41,17 @@ object UtilsFunctions {
         messageTextView.gravity = Gravity.CENTER
         view.setBackgroundColor(ContextCompat.getColor(MyApplication.instance, R.color.colorRed))
         toast.show()
+    }
+
+    fun getValidUri(file: File, context: Context): Uri? {
+        var outputUri: Uri? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            outputUri =
+                FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            outputUri = Uri.fromFile(file)
+        }
+        return outputUri
     }
 
     @JvmStatic

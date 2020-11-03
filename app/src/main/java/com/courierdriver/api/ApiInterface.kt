@@ -160,7 +160,7 @@ interface ApiInterface {
     @POST("delivery/orders/markComplete")
     fun completeOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
-    @GET("delivery/orders/cancelReq")
+    @POST("delivery/orders/cancelReq")
     fun cancelRequests(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
     @GET("delivery/orders/cancelReasons")

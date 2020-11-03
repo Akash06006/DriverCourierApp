@@ -18,6 +18,66 @@ class OrdersDetailResponse {
     /*
     private String[] pickupInstructions;
 */
+    /*({
+    body =     {
+        adminComission = 256;
+        createdAt = "19/10/2020 03:26";
+        deliveryAddress =         (
+                        {
+                address = "Old Power House Rd, Jalalabad, Punjab 152023, India";
+                date = "19-10-2020";
+                id = 1;
+                isComplete = 0;
+                lat = "30.605209213458416";
+                long = "74.25226170569658";
+                phoneNumber = 9530606006;
+                time = "18:47";
+            },
+                        {
+                address = "BDO office St, Dashmesh Nagri, Jalalabad, Punjab 152023, India";
+                date = "19-10-2020";
+                id = 2;
+                isComplete = 0;
+                lat = "30.602991233396505";
+                long = "74.25090216100216";
+                time = "21:33";
+            }
+        );
+        deliveryoption =         {
+            title = "Same day";
+        };
+        driverCCharges = 50;
+        driverEarning = 1024;
+        fareCollected = "Pickup end";
+        id = "65bd4a1b-9120-49b6-a96d-5af92afa86d8";
+        itemName = "new order";
+        orderNo = ORDER0033;
+        orderStatus =         {
+            status = 2;
+            statusName = Accepted;
+        };
+        pickupAddress =         {
+            address = "Muktsar Rd, Jalalabad, Punjab 152023, India";
+            date = "19-10-2020";
+            id = 1;
+            lat = "30.604600615866477";
+            long = "74.25047468394041";
+            phoneNumber = "90564 43279";
+            time = "15:47";
+        };
+        progressStatus = 2;
+        totalOrderPrice = 1280;
+        vehicle =         {
+            name = Bus;
+        };
+        weight =         {
+            name = "1 to 5kg";
+        };
+    };
+    code = 200;
+    message = Details;
+})*/
+
 
     class Data {
         @SerializedName("pickupAddress")

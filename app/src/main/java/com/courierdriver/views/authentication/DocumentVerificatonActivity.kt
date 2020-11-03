@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.courierdriver.R
 import com.courierdriver.callbacks.ChoiceCallBack
+import com.courierdriver.callbacks.SelfieCallBack
 import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.constants.GlobalConstants
 import com.courierdriver.databinding.ActivityDocumentVerificatonBinding
@@ -30,7 +31,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
+class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack,SelfieCallBack {
     private lateinit var activityDocVeribinding: ActivityDocumentVerificatonBinding
     private lateinit var docVerifyViewModel: DocVerifyViewModel
     private var confirmationDialog: Dialog? = null
@@ -70,8 +71,6 @@ class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
                         dlNumber = activityDocVeribinding.etDrivingLicenseNo.text.toString()
                         dlNumber = activityDocVeribinding.etLastname.text.toString()
                         val mHashMap = HashMap<String, RequestBody>()
-                        mHashMap["companyId"] =
-                            Utils(this).createPartFromString(userId)
                         mHashMap["dlNumber"] =
                             Utils(this).createPartFromString(dlNumber)
                         mHashMap["transportType"] =
@@ -362,6 +361,10 @@ class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
             .load(path)
             .placeholder(R.drawable.ic_person)
             .into(activityDocVeribinding.backDrivingIv)
+    }
+
+    override fun selfieFromCamera(mKey: String) {
+
     }
 
 }
