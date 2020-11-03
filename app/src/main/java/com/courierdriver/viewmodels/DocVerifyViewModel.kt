@@ -7,9 +7,6 @@ import com.courierdriver.common.UtilsFunctions
 import com.courierdriver.model.LoginResponse
 import com.courierdriver.model.profile.RegionResponse
 import com.courierdriver.repositories.DocVerifyRepository
-import com.courierdriver.repositories.profile.ProfileRepository
-import com.courierdriver.viewmodels.BaseViewModel
-import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -22,7 +19,7 @@ class DocVerifyViewModel : BaseViewModel() {
 
     init {
         if (UtilsFunctions.isNetworkConnectedReturn()) {
-            data = docVerifyRepository.docVerify(null, null)
+            data = docVerifyRepository.docVerify(null, null,null,null,null,null)
           //  regionResponse = profileRepository.getRegoins()
         }
 
@@ -52,9 +49,16 @@ class DocVerifyViewModel : BaseViewModel() {
 
 
 
-    fun hitDocVerifyApi(hashMap : HashMap<String, RequestBody>, image : MultipartBody.Part?) {
+    fun hitDocVerifyApi(
+        hashMap: HashMap<String, RequestBody>,
+        poaFront: MultipartBody.Part?,
+        poaBack: MultipartBody.Part?,
+        licenseFront: MultipartBody.Part?,
+        licenseBack: MultipartBody.Part?,
+        panCard: MultipartBody.Part?
+    ) {
         if (UtilsFunctions.isNetworkConnected()) {
-            data = docVerifyRepository.docVerify(hashMap, image)
+            data = docVerifyRepository.docVerify(hashMap, poaFront,poaBack,licenseFront,licenseBack,panCard)
             mIsUpdating.postValue(true)
 
         }

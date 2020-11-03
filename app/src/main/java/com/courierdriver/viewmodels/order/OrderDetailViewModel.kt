@@ -32,6 +32,9 @@ class OrderDetailViewModel : BaseViewModel() {
     private var paymentStatus = MutableLiveData<CommonModel>()
     private var orderDetail = MutableLiveData<OrdersDetailResponse>()
     private var cancelReason = MutableLiveData<CancelReasonsListResponse>()
+    private var acceptOrderList: MutableLiveData<CommonModel>? = MutableLiveData()
+    private var completeOrder: MutableLiveData<CommonModel>? = MutableLiveData()
+    private var pickupOrderResponse: MutableLiveData<CommonModel>? = MutableLiveData()
     private var cancelOrder = MutableLiveData<CommonModel>()
     private var profileDetail = MutableLiveData<LoginResponse>()
     private var orderRepository = OrderDetailRepository()
@@ -44,7 +47,7 @@ class OrderDetailViewModel : BaseViewModel() {
             data = orderRepository.updateUserProfile(null, null)
             listsResponse = orderRepository.getDataLists()
             orderList = orderRepository.getOrderList("")
-
+            acceptOrderList = orderRepository.acceptOrder(null, acceptOrderList)
             calculatePrice = orderRepository.calculatePrice(null)
             applyCoupon = orderRepository.applyCoupon(null)
             removeCoupon = orderRepository.removeCoupon(null)
@@ -57,6 +60,17 @@ class OrderDetailViewModel : BaseViewModel() {
         }
 
     }
+    fun acceptOrderData(): LiveData<CommonModel> {
+        return acceptOrderList!!
+    }
+
+    fun pickupOrderData(): LiveData<CommonModel> {
+        return pickupOrderResponse!!
+    }
+    fun completeOrderData(): LiveData<CommonModel> {
+        return completeOrder!!
+    }
+
 
     fun getDetail() : LiveData<LoginResponse> {
         return profileDetail
@@ -147,6 +161,34 @@ class OrderDetailViewModel : BaseViewModel() {
             removeCoupon = orderRepository.removeCoupon(mJsonObject)
             mIsUpdating.postValue(true)
 
+        }
+    }
+
+    fun acceptOrder(id: String) {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("id", id)
+            acceptOrderList = orderRepository.acceptOrder(jsonObject, acceptOrderList)
+            mIsUpdating.postValue(true)
+        }
+    }
+
+    fun pickupOrder(id: String) {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("id", id)
+            pickupOrderResponse = orderRepository.pickupOrder(jsonObject, pickupOrderResponse)
+            mIsUpdating.postValue(true)
+        }
+    }
+
+    fun completeOrder(id: String,addressId: String) {
+        if (UtilsFunctions.isNetworkConnected()) {
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("orderId", id)
+            jsonObject.addProperty("addressId", addressId)
+            completeOrder = orderRepository.completeOrder(jsonObject, completeOrder)
+            mIsUpdating.postValue(true)
         }
     }
 

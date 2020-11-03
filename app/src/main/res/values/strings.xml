@@ -121,6 +121,7 @@
     <string name="transportation_type">Transportation type</string>
     <string name="phone_number">Phone Number</string>
     <string name="accept_terms">Accept Terms and Conditions</string>
+    <string name="accept">Accept</string>
     <string name="dummy_name">Karan</string>
     <string name="front">Front</string>
     <string name="back_">Back</string>
@@ -233,7 +234,11 @@
     <string name="proof_of_address">Proof of address (Aadhar Photo)</string>
     <string name="delivery_few_minutes">Delivery within few minutes</string>
     <string name="new_order">New Order</string>
+    <string name="order_no">Order No</string>
     <string name="vehicle_type">Vehicle Type</string>
+    <string name="total_order_price">Total order price</string>
+
+    <string name="fare_to_be_collected">Fare To be collected</string>
     <string name="delivery_option">Delivery option</string>
     <string name="pickup_location">Pickup Location</string>
     <string name="mob_no">Mobile No</string>
@@ -271,6 +276,8 @@
     <string name="pickup_address">Pickup Address</string>
     <string name="delivery_address">Delivery Address</string>
     <string name="delivery_options">Delivery Options</string>
+    <string name="your_earning">Your Earning</string>
+    <string name="pay_to_locomo">Pay To Locomo</string>
     <string name="value">Value</string>
     <string name="take_order">Take Order</string>
 

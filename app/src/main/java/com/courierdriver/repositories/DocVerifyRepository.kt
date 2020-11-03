@@ -26,10 +26,7 @@ class DocVerifyRepository {
         data3 = MutableLiveData()
     }
 
-    fun docVerify(
-        hashMap : HashMap<String, RequestBody>?,
-        image : MultipartBody.Part?
-    ) : MutableLiveData<LoginResponse> {
+    fun docVerify(hashMap : HashMap<String, RequestBody>?, poaFront : MultipartBody.Part?, poaBack : MultipartBody.Part?, licenseFront : MultipartBody.Part?, licenseBack : MultipartBody.Part?, panCard : MultipartBody.Part?) : MutableLiveData<LoginResponse> {
         if (hashMap != null) {
             val mApiService = ApiService<JsonObject>()
             mApiService.get(
@@ -58,7 +55,7 @@ class DocVerifyRepository {
 
                     }
 
-                }, ApiClient.getApiInterface().callUpdateProfile(hashMap, image)//TODO change url and image structure
+                }, ApiClient.getApiInterface().callverifyDoc(hashMap, poaFront,poaBack,licenseFront,licenseBack,panCard)
             )
         }
         return data!!

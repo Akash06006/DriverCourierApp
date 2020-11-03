@@ -28,20 +28,21 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.courierdriver.R
+import com.courierdriver.adapters.orders.DetailDeliveryAddressAdapter
 import com.courierdriver.utils.BaseActivity
 import com.courierdriver.common.UtilsFunctions
-import  com.courierdriver.constants.GlobalConstants
+import com.courierdriver.constants.GlobalConstants
 import com.courierdriver.databinding.ActivityOrderDetailsBinding
 
 import  com.courierdriver.maps.FusedLocationClass
 import  com.courierdriver.model.CommonModel
 import  com.courierdriver.model.order.ListsResponse
 import  com.courierdriver.model.order.OrdersDetailResponse
-import  com.courierdriver.sharedpreference.SharedPrefClass
+import com.courierdriver.sharedpreference.SharedPrefClass
 import com.courierdriver.viewmodels.order.OrderDetailViewModel
-import  com.courierdriver.viewmodels.order.OrderViewModel
 import com.example.courier.model.order.CancelReasonsListResponse
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -57,46 +58,48 @@ import kotlin.collections.ArrayList
 class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListener,
     GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
     GoogleMap.OnCameraIdleListener {
-    private lateinit var activityCreateOrderBinding : ActivityOrderDetailsBinding
-    private lateinit var orderViewModel : OrderDetailViewModel
+    private lateinit var activityCreateOrderBinding: ActivityOrderDetailsBinding
+    private lateinit var orderViewModel: OrderDetailViewModel
     var vehicleList = ArrayList<ListsResponse.VehicleData>()
-   // var bannersList = ArrayList<ListsResponse.BannersData>()
+
+    // var bannersList = ArrayList<ListsResponse.BannersData>()
     var deliveryTypeList = ArrayList<ListsResponse.DeliveryOptionData>()
     var weightList = ArrayList<ListsResponse.WeightData>()
-    private var check : Int = 0
-    private var confirmationDialog : Dialog? = null
+    private var check: Int = 0
+    private var confirmationDialog: Dialog? = null
     private val AUTOCOMPLETE_REQUEST_CODE = 1
-    private var mGoogleMap : GoogleMap? = null
+    private var mGoogleMap: GoogleMap? = null
     private var mPermissionCheck = false
-    private var dialog : Dialog? = null
-    private var locationDialog : Dialog? = null
-    private var mGoogleApiClient : GoogleApiClient? = null
+    private var dialog: Dialog? = null
+    private var locationDialog: Dialog? = null
+    private var mGoogleApiClient: GoogleApiClient? = null
     private var click_settings = 1
     private var click_gps = 1
     private var mHandler = Handler()
-    private var mLatitude : String? = null
-    private var mLongitude : String? = null
+    private var mLatitude: String? = null
+    private var mLongitude: String? = null
     private var scan = 0
     private var start = 0
     private var permanent_deny = 0
     val MY_PERMISSIONS_REQUEST_LOCATION = 99
-    private var mContext : Context? = null
-    private var locationManager : LocationManager? = null;
+    private var mContext: Context? = null
+    private var locationManager: LocationManager? = null;
     private val MIN_TIME = 400;
     private val MIN_DISTANCE = 1000;
-    private var mFusedLocationClass : FusedLocationClass? = null
-    internal var mFusedLocationClient : FusedLocationProviderClient? = null
-    private var mLocation : Location? = null
+    private var mFusedLocationClass: FusedLocationClass? = null
+    internal var mFusedLocationClient: FusedLocationProviderClient? = null
+    private var mLocation: Location? = null
     internal var cameraZoom = 16.0f
     private var mAddress = ""
     var orderId = ""
-    internal lateinit var mLastLocation : Location
-    internal lateinit var mLocationCallback : LocationCallback
-    internal var mCurrLocationMarker : Marker? = null
-    internal lateinit var mLocationRequest : LocationRequest
+    var userId =""
+    internal lateinit var mLastLocation: Location
+    internal lateinit var mLocationCallback: LocationCallback
+    internal var mCurrLocationMarker: Marker? = null
+    internal lateinit var mLocationRequest: LocationRequest
     var reasons = java.util.ArrayList<String>()
     var cancelledCharges = "0"
-    override fun getLayoutId() : Int {
+    override fun getLayoutId(): Int {
         return R.layout.activity_order_details
     }
 
@@ -115,7 +118,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         if (UtilsFunctions.isNetworkConnected()) {
             startProgressDialog()
             orderViewModel.orderDetail(orderId)
-           // orderViewModel.cancelReason(orderId)
+          //   orderViewModel.cancelReason(userId)
         }
     }
 
@@ -132,11 +135,8 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         orderViewModel = ViewModelProviders.of(this).get(OrderDetailViewModel::class.java)
         activityCreateOrderBinding.orderDetailViewModel = orderViewModel
         mContext = this
-        val userImage =
-            SharedPrefClass().getPrefValue(this, GlobalConstants.USER_IMAGE).toString()
-        Glide.with(this).load(userImage).placeholder(R.drawable.ic_user)
-            .into(activityCreateOrderBinding.toolbarCommon.imgRight)
-        // activityCreateOrderBinding.toolbarCommon.imgToolbarText.text = "Order #123"
+        activityCreateOrderBinding.toolbarCommon.imgRight.visibility = View.GONE
+
         val supportMapFragment =
             supportFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment?
         supportMapFragment?.getMapAsync(this)
@@ -144,14 +144,15 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         reasons.add("Select Reason")
         orderId = intent.extras?.get("id").toString()
         val activeOrder = intent.extras?.get("active").toString()
+        userId = SharedPrefClass().getPrefValue(this, GlobalConstants.USER_ID).toString()
         if (activeOrder.equals("true")) {
-            activityCreateOrderBinding.bottomButtons.visibility = View.VISIBLE
+            // activityCreateOrderBinding.bottomButtons.visibility = View.VISIBLE
         } else {
-            activityCreateOrderBinding.bottomButtons.visibility = View.GONE
+            //  activityCreateOrderBinding.bottomButtons.visibility = View.GONE
         }
         // Specify the types of place data to return.
         orderViewModel.cancelReasonRes().observe(this,
-            Observer<CancelReasonsListResponse> { response->
+            Observer<CancelReasonsListResponse> { response ->
                 stopProgressDialog()
 
                 if (response != null) {
@@ -171,7 +172,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
             })
 
         orderViewModel.cancelOrderRes().observe(this,
-            Observer<CommonModel> { response->
+            Observer<CommonModel> { response ->
                 stopProgressDialog()
 
                 if (response != null) {
@@ -191,7 +192,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
 
 
         orderViewModel.orderDetailRes().observe(this,
-            Observer<OrdersDetailResponse> { response->
+            Observer<OrdersDetailResponse> { response ->
                 stopProgressDialog()
 
                 if (response != null) {
@@ -202,6 +203,8 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
                             cancelledCharges = response.data?.cancellationCharges!!
                             activityCreateOrderBinding.toolbarCommon.imgToolbarText.text =
                                 "Order #" + response.data?.orderNo!!
+                            setDeliveryAddressAdapter(response.data?.deliveryAddress)
+                            hideUnhideButtons(response.data!!)
                             val source = LatLng(
                                 response.data?.pickupAddress?.lat!!.toDouble(),
                                 response.data?.pickupAddress?.long!!.toDouble()
@@ -210,7 +213,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
                             mGoogleMap!!.moveCamera(CameraUpdateFactory.newLatLng(source))
                             mGoogleMap!!.animateCamera(CameraUpdateFactory.zoomTo(16f))
                             var isSourceAdded = false
-                            var destination : LatLng?
+                            var destination: LatLng?
                             for (item in response.data?.deliveryAddress!!) {
                                 destination = LatLng(
                                     item.lat!!.toDouble(),
@@ -234,24 +237,111 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
             })
 
 
+        orderViewModel.acceptOrderData().observe(this,
+            Observer<CommonModel> { response ->
+                if (response != null) {
+                    val message = response.message
+                    when (response.code) {
+                        200 -> {
+                            UtilsFunctions.showToastSuccess(message!!)
+                        }
+                        else -> UtilsFunctions.showToastError(message!!)
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
+
+        orderViewModel.pickupOrderData().observe(this,
+            Observer<CommonModel> { response ->
+                if (response != null) {
+                    val message = response.message
+                    when (response.code) {
+                        200 -> {
+                            UtilsFunctions.showToastSuccess(message!!)
+                        }
+                        else -> UtilsFunctions.showToastError(message!!)
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
+        orderViewModel.completeOrderData().observe(this,
+            Observer<CommonModel> { response ->
+                if (response != null) {
+                    val message = response.message
+                    when (response.code) {
+                        200 -> {
+                            UtilsFunctions.showToastSuccess(message!!)
+                        }
+                        else -> UtilsFunctions.showToastError(message!!)
+                    }
+                } else {
+                    UtilsFunctions.showToastError(resources.getString(R.string.internal_server_error))
+                }
+            })
 
         orderViewModel.isClick().observe(
             this, Observer<String>(function =
-            fun(it : String?) {
+            fun(it: String?) {
                 when (it) {
-                    "btnCancel" -> {
-                        // Set the fields to specify which types of place data to
+
+                    "tv_complete_order" -> {
+                        orderViewModel.completeOrder(orderId, "")
+                    }
+                    "tv_accepted_cancel_order" -> {
+                    // Set the fields to specify which types of place data to
                         showCancelReasonDialog()
                     }
-                    "btnSchedule" -> {
-                        val intent = Intent(this, CreateOrderActivty::class.java)
-                        intent.putExtra("id", orderId)
-                        startActivity(intent)
+                    "tv_accepted_take_order" -> {
+                        orderViewModel.pickupOrder(orderId)
+                    }
+                    "tv_available_cancel_order" -> {
+                    // Set the fields to specify which types of place data to
+                        showCancelReasonDialog()
+                    }
+                    "tv_available_accept_order" -> {
+                        orderViewModel.acceptOrder(orderId)
                     }
                 }
             })
         )
 
+    }
+
+    private fun hideUnhideButtons(data: OrdersDetailResponse.Data) {
+        var orderStatus = data.orderStatus?.status // 1 available, 2 active, 3 completed
+        var orderStatusName = data.orderStatus?.statusName
+        if (orderStatus.equals("1")) {
+            activityCreateOrderBinding.llAvailable.visibility = View.VISIBLE
+            activityCreateOrderBinding.llAcceptedTakeOrder.visibility = View.GONE
+            activityCreateOrderBinding.llCompleteOrder.visibility = View.GONE
+        } else if (orderStatus.equals("2")) {
+            if (orderStatusName.equals("pickup")) {
+                activityCreateOrderBinding.llAvailable.visibility = View.GONE
+                activityCreateOrderBinding.llAcceptedTakeOrder.visibility = View.GONE
+                activityCreateOrderBinding.llCompleteOrder.visibility = View.VISIBLE
+            } else {
+                activityCreateOrderBinding.llAvailable.visibility = View.GONE
+                activityCreateOrderBinding.llAcceptedTakeOrder.visibility = View.VISIBLE
+                activityCreateOrderBinding.llCompleteOrder.visibility = View.GONE
+            }
+
+        } else if (orderStatus.equals("3")) {
+            activityCreateOrderBinding.llAvailable.visibility = View.GONE
+            activityCreateOrderBinding.llAcceptedTakeOrder.visibility = View.GONE
+            activityCreateOrderBinding.llCompleteOrder.visibility = View.GONE
+        }
+
+    }
+
+    private fun setDeliveryAddressAdapter(deliveryAddressList: ArrayList<OrdersDetailResponse.PickupAddress>?) {
+        val linearLayoutManager = LinearLayoutManager(this)
+        val deliveryAddressAdapter =
+            DetailDeliveryAddressAdapter(this, deliveryAddressList!!)
+        linearLayoutManager.orientation = RecyclerView.VERTICAL
+        activityCreateOrderBinding.rvDeliveryAddress.layoutManager = linearLayoutManager
+        activityCreateOrderBinding.rvDeliveryAddress.adapter = deliveryAddressAdapter
     }
 
     /*override fun onMapReady(googleMap : GoogleMap) {
@@ -266,7 +356,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
 
     }*/
     //region mp
-    override fun onMapReady(googleMap : GoogleMap) {
+    override fun onMapReady(googleMap: GoogleMap) {
         this.mGoogleMap = googleMap
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -297,7 +387,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         mGoogleApiClient!!.connect()
     }
 
-    override fun onConnected(bundle : Bundle?) {
+    override fun onConnected(bundle: Bundle?) {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -340,7 +430,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         )
     }
 
-    override fun onLocationChanged(location : Location) {
+    override fun onLocationChanged(location: Location) {
         mLastLocation = location
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker!!.remove()
@@ -362,11 +452,11 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         mFusedLocationClient?.removeLocationUpdates(mLocationCallback)
     }
 
-    override fun onConnectionFailed(connectionResult : ConnectionResult) {
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {
         Toast.makeText(applicationContext, "connection failed", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onConnectionSuspended(p0 : Int) {
+    override fun onConnectionSuspended(p0: Int) {
         Toast.makeText(applicationContext, "connection suspended", Toast.LENGTH_SHORT).show()
     }
 
@@ -408,8 +498,8 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
-        requestCode : Int, permissions : Array<String>,
-        grantResults : IntArray
+        requestCode: Int, permissions: Array<String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == MY_PERMISSIONS_REQUEST_LOCATION && permissions.size > 0) {
@@ -449,7 +539,10 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         }
     }
 
-    fun bitmapDescriptorFromVector(context : Context, @DrawableRes vectorDrawableResourceId : Int) : BitmapDescriptor {
+    fun bitmapDescriptorFromVector(
+        context: Context,
+        @DrawableRes vectorDrawableResourceId: Int
+    ): BitmapDescriptor {
         var background =
             ContextCompat.getDrawable(this, vectorDrawableResourceId/*R.drawable.ic_app*/);
         background?.setBounds(
@@ -515,8 +608,8 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
         spReason?.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent : AdapterView<*>,
-                view : View, position : Int, id : Long
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
             ) {
                 //if (position != 0) {
                 pos = position
@@ -536,7 +629,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
  */
             }
 
-            override fun onNothingSelected(parent : AdapterView<*>) {
+            override fun onNothingSelected(parent: AdapterView<*>) {
                 // write code to perform some action
             }
         }
@@ -601,11 +694,11 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
     }
 
     private fun drawPolyline(
-        sourceLatLng : LatLng,
-        destinationLatLng : LatLng,
-        isSourceAdded : Boolean
+        sourceLatLng: LatLng,
+        destinationLatLng: LatLng,
+        isSourceAdded: Boolean
     ) {
-        var path : MutableList<LatLng> = ArrayList()
+        var path: MutableList<LatLng> = ArrayList()
         val context = GeoApiContext.Builder()
             .apiKey(getString(R.string.maps_api_key))
             .build()
@@ -614,7 +707,8 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
             /*sourceLatLng.latitude.toString().plus(",").plus(sourceLatLng.longitude),
             destinationLatLng.latitude.toString().plus(",").plus(destinationLatLng.longitude)*/
             sourceLatLng.latitude.toString().plus(",").plus(sourceLatLng.longitude.toString()),
-            destinationLatLng.latitude.toString().plus(",").plus(destinationLatLng.longitude.toString())
+            destinationLatLng.latitude.toString().plus(",")
+                .plus(destinationLatLng.longitude.toString())
         )
         try {
             val res = req.await()
@@ -658,7 +752,7 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
                 //  mGoogleMap.drawPolyline("Destination is not detected,unable to draw path")
                 Log.d("MapPath", "Unable to draw path")
             }
-        } catch (ex : Exception) {
+        } catch (ex: Exception) {
             ex.printStackTrace()
         }
 
@@ -666,31 +760,31 @@ class OrderDetailsActivity : BaseActivity(), OnMapReadyCallback, LocationListene
 
     }
 
-    var polyPath : MutableList<LatLng>? = null
+    var polyPath: MutableList<LatLng>? = null
     private fun drawLine(
-        path : MutableList<LatLng>,
-        sourceLatLng : LatLng,
-        destinationLatLng : LatLng, isSourceAdded : Boolean
+        path: MutableList<LatLng>,
+        sourceLatLng: LatLng,
+        destinationLatLng: LatLng, isSourceAdded: Boolean
     ) {
         polyPath = path
         // mGoogleMap?.clear()
-        var ic_source : BitmapDescriptor
+        var ic_source: BitmapDescriptor
         if (isSourceAdded) {
             ic_source = bitmapDescriptorFromVector(
                 this,
-                R.drawable.ic_source
+                R.drawable.your_loc_marker
             )//ic_source
         } else {
             /* ic_source = BitmapDescriptorFactory.fromResource(R.drawable.ic_destination)*/
             ic_source = bitmapDescriptorFromVector(
                 this,
-                R.drawable.ic_destination
+                R.drawable.destination_marker
             )
         }
         // var ic_destination = BitmapDescriptorFactory.fromResource(R.drawable.ic_destination)
         var ic_destination = bitmapDescriptorFromVector(
             this,
-            R.drawable.ic_destination
+            R.drawable.destination_marker
         )
         //var icon = bitmapDescriptorFromVector(this, R.drawable.ic_map_pin)
         //  if (isSourceAdded) {

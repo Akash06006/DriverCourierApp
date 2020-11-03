@@ -25,6 +25,9 @@ object GlobalConstants {
     val USERDATA = "USERDATA"
     @JvmStatic
     val USERID = "USERID"
+
+    @JvmStatic
+    val USER_ID = "USER_ID"
     @JvmStatic
     val USER_IMAGE = "USERID"
     @JvmStatic

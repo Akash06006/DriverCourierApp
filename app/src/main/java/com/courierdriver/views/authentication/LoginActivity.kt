@@ -65,6 +65,11 @@ class LoginActivity : BaseActivity() {
                         )
                         SharedPrefClass().putObject(
                             MyApplication.instance,
+                            GlobalConstants.USER_ID,
+                            loginResponse.data!!.id
+                        )
+                        SharedPrefClass().putObject(
+                            MyApplication.instance,
                             GlobalConstants.USER_IMAGE,
                             loginResponse.data!!.image
                         )

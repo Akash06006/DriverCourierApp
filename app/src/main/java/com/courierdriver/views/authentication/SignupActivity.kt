@@ -99,6 +99,11 @@ class SignupActivity : BaseActivity() {
                         )
                         SharedPrefClass().putObject(
                             MyApplication.instance,
+                            GlobalConstants.USER_ID,
+                            loginResponse.data!!.id
+                        )
+                        SharedPrefClass().putObject(
+                            MyApplication.instance,
                             GlobalConstants.IS_SOCIAL,
                             isSocial
                         )

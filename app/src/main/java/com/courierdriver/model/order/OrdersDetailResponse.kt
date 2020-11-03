@@ -8,10 +8,17 @@ class OrdersDetailResponse {
     @Expose
     var data : Data? = null
     @SerializedName("message")
+    @Expose
     var message : String? = null
+    @SerializedName("code")
+    @Expose
     var code : Int? = null
 
     /*deliveryOption -> {JsonPrimitive@8505} ""51b1c365-b88b-4ca4-bf01-4361c0a1ee3c""*/
+    /*
+    private String[] pickupInstructions;
+*/
+
     class Data {
         @SerializedName("pickupAddress")
         @Expose
@@ -19,6 +26,35 @@ class OrdersDetailResponse {
         @SerializedName("deliveryAddress")
         @Expose
         var deliveryAddress : ArrayList<PickupAddress>? = null
+
+        @SerializedName("isPaid")
+        @Expose
+        var isPaid : String? = null
+
+        @SerializedName("offerPrice")
+        @Expose
+        var offerPrice : String? = null
+
+        @SerializedName("pickupLong")
+        @Expose
+        var pickupLong : String? = null
+
+        @SerializedName("updatedAt")
+        @Expose
+        var updatedAt : String? = null
+
+        @SerializedName("tip")
+        @Expose
+        var tip : String? = null
+
+        @SerializedName("pickupLat")
+        @Expose
+        var pickupLat : String? = null
+
+        @SerializedName("createdAt")
+        @Expose
+        var createdAt : String? = null
+
         @SerializedName("weight")
         @Expose
         var weight : WeightData? = null
@@ -106,7 +142,7 @@ class OrdersDetailResponse {
         @SerializedName("deliveryCharges")
         @Expose
         var deliveryCharges : String? = null
-        @SerializedName("cancellationCharges")
+        @SerializedName("cancelCharges")
         @Expose
         var cancellationCharges : String? = null
         @SerializedName("cancelOrderId")

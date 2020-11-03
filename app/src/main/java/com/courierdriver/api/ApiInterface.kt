@@ -19,6 +19,13 @@ interface ApiInterface {
                 RequestBody>, @Part image : MultipartBody.Part?
     ) : Call<JsonObject>
 
+    @Multipart
+    @POST("delivery/auth/uploadDoc")
+    fun callverifyDoc(
+        @PartMap mHashMap : HashMap<String,
+                RequestBody>, poaFront : MultipartBody.Part?, poaBack : MultipartBody.Part?, licenseFront : MultipartBody.Part?, licenseBack : MultipartBody.Part?, panCard : MultipartBody.Part?
+    ) : Call<JsonObject>
+
     @GET("delivery/auth/profile")
     fun getProfile() : Call<JsonObject>
 
@@ -60,7 +67,7 @@ interface ApiInterface {
     @POST("mobile/orders/priceCalc")
     fun calculatePrice(@Body jsonObject : JsonObject) : Call<JsonObject>
 
-    @GET("delivery/orders/cancelReasons")
+    @GET("delivery/orders/getCancelReasons")
     fun cancelReason() : Call<JsonObject>
 
     @POST("mobile/orders/create")
@@ -81,7 +88,7 @@ interface ApiInterface {
     @POST("mobile/coupan/removeCoupan")
     fun removeCoupon(@Body jsonObject : JsonObject) : Call<JsonObject>
 
-    @POST("delivery/orders/cancel")
+    @POST("delivery/orders/cancelReq")
     fun cancelOrder(@Body jsonObject : JsonObject) : Call<JsonObject>
 
     @GET("https://maps.googleapis.com/maps/api/distancematrix/json")
@@ -142,6 +149,12 @@ interface ApiInterface {
 
     @POST("delivery/orders/acceptOrder")
     fun acceptOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("delivery/orders/orderPickup")
+    fun pickupOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
+
+    @POST("delivery/orders/markComplete")
+    fun completeOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
     @GET("delivery/orders/cancelReq")
     fun cancelRequests(@Body mJsonObject : JsonObject) : Call<JsonObject>

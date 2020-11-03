@@ -14,10 +14,17 @@ import com.bumptech.glide.Glide
 import com.courierdriver.R
 import com.courierdriver.callbacks.ChoiceCallBack
 import com.courierdriver.common.UtilsFunctions
+import com.courierdriver.constants.GlobalConstants
 import com.courierdriver.databinding.ActivityDocumentVerificatonBinding
+import com.courierdriver.model.LoginResponse
+import com.courierdriver.sharedpreference.SharedPrefClass
 import com.courierdriver.utils.BaseActivity
 import com.courierdriver.utils.DialogClass
+import com.courierdriver.utils.Utils
 import com.courierdriver.viewmodels.DocVerifyViewModel
+import com.courierdriver.views.home.LandingActivty
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -37,7 +44,9 @@ class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
     private var drivingBackImg = ""
     private var drivingFrontImg = ""
     private var panCardImage = ""
-
+    private var dlNumber = ""
+    private var transportType= ""
+    var userId = ""
     override fun getLayoutId(): Int {
         return R.layout.activity_document_verificaton
     }
@@ -48,6 +57,9 @@ class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
         activityDocVeribinding.docVerifyViewModel = docVerifyViewModel
         activityDocVeribinding.toolbarCommon.imgToolbarText.text = "Document Information"
         activityDocVeribinding.toolbarCommon.imgRight.visibility = View.GONE
+          userId =
+            SharedPrefClass().getPrefValue(this, GlobalConstants.USER_ID).toString()
+
 
         docVerifyViewModel.isClick().observe(
             this, Observer<String>(function =
@@ -55,7 +67,69 @@ class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
                 buttonClickedId = it.toString()
                 when (it) {
                     "btn_submit" -> {
-                        UtilsFunctions.showToastError("unexpected end of stream on Connection")
+                        dlNumber = activityDocVeribinding.etDrivingLicenseNo.text.toString()
+                        dlNumber = activityDocVeribinding.etLastname.text.toString()
+                        val mHashMap = HashMap<String, RequestBody>()
+                        mHashMap["companyId"] =
+                            Utils(this).createPartFromString(userId)
+                        mHashMap["dlNumber"] =
+                            Utils(this).createPartFromString(dlNumber)
+                        mHashMap["transportType"] =
+                            Utils(this).createPartFromString(transportType)
+                        //  mHashMap["password"] = Utils(this).createPartFromString(password)
+                        var poaFront : MultipartBody.Part? = null
+                        if (!aadharFrontImg.isEmpty()) {
+                            val f1 = File(aadharFrontImg)
+                            poaFront =
+                                Utils(this).prepareFilePart(
+                                    "poaFront",
+                                    f1
+                                )
+                        }
+
+                        var poaBack : MultipartBody.Part? = null
+                        if (!aadharBackImg.isEmpty()) {
+                            val f1 = File(aadharBackImg)
+                            poaBack =
+                                Utils(this).prepareFilePart(
+                                    "poaBack",
+                                    f1
+                                )
+                        }
+                        var licenseFront : MultipartBody.Part? = null
+                        if (!drivingFrontImg.isEmpty()) {
+                            val f1 = File(drivingFrontImg)
+                            licenseFront =
+                                Utils(this).prepareFilePart(
+                                    "licenseFront",
+                                    f1
+                                )
+                        }
+
+                        var licenseBack : MultipartBody.Part? = null
+                        if (!drivingBackImg.isEmpty()) {
+                            val f1 = File(drivingBackImg)
+                            licenseBack =
+                                Utils(this).prepareFilePart(
+                                    "licenseBack",
+                                    f1
+                                )
+                        }
+
+                        var panCard : MultipartBody.Part? = null
+                        if (!panCardImage.isEmpty()) {
+                            val f1 = File(panCardImage)
+                            panCard =
+                                Utils(this).prepareFilePart(
+                                    "panCard",
+                                    f1
+                                )
+                        }
+
+                        if (UtilsFunctions.isNetworkConnected()) {
+                            startProgressDialog()
+                            docVerifyViewModel.hitDocVerifyApi(mHashMap,poaFront,poaBack,licenseFront,licenseBack,panCard)
+                        }
                     }
                     "iv_edit" -> {
                         // editImage = 0
@@ -117,83 +191,25 @@ class DocumentVerificatonActivity : BaseActivity(), ChoiceCallBack {
                         }
 
                     }
-                    /* "btn_submit" -> {
-                         val fname = profileBinding.etFirstname.text.toString()
-                         val lname = profileBinding.etLastname.text.toString()
-                         val email = profileBinding.etEmail.text.toString()
-                         val phone = profileBinding.etPhone.text.toString()
-                         when {
-                             fname.isEmpty() -> showError(
-                                 profileBinding.etFirstname,
-                                 getString(R.string.empty) + " " + getString(
-                                     R.string.fname
-                                 )
-                             )
-                             lname.isEmpty() -> showError(
-                                 profileBinding.etLastname,
-                                 getString(R.string.empty) + " " + getString(
-                                     R.string.lname
-                                 )
-                             )
-                             email.isEmpty() -> showError(
-                                 profileBinding.etEmail,
-                                 getString(R.string.empty) + " " + getString(
-                                     R.string.email
-                                 )
-                             )
-                             !email.matches((ValidationsClass.EMAIL_PATTERN).toRegex()) ->
-                                 showError(
-                                     profileBinding.etEmail,
-                                     getString(R.string.invalid) + " " + getString(
-                                         R.string.email
-                                     )
-                                 )
-                             regionId.equals("0") -> {
-                                 UtilsFunctions.showToastError("Please select region")
-                             }
-                             else -> {
-                                 *//* val phonenumber = SharedPrefClass().getPrefValue(
-                                     MyApplication.instance,
-                                     getString(R.string.key_phone)
-                                 ) as String
-                                 val countrycode = SharedPrefClass().getPrefValue(
-                                     MyApplication.instance,
-                                     getString(R.string.key_country_code)
-                                 ) as String*//*
-                                val androidId = UtilsFunctions.getAndroidID()
-                                val mHashMap = HashMap<String, RequestBody>()
-                                mHashMap["firstName"] =
-                                    Utils(activity!!).createPartFromString(fname)
-                                mHashMap["lastName"] =
-                                    Utils(activity!!).createPartFromString(lname)
-                                mHashMap["email"] =
-                                    Utils(activity!!).createPartFromString(email)
-                                mHashMap["phoneNumber"] =
-                                    Utils(activity!!).createPartFromString(phone)
-                                mHashMap["regionId"] =
-                                    Utils(activity!!).createPartFromString(reginRes[regionPos].id!!)
-                                //  mHashMap["password"] = Utils(this).createPartFromString(password)
-                                var userImage : MultipartBody.Part? = null
-                                if (!profileImage.isEmpty()) {
-                                    val f1 = File(profileImage)
-                                    userImage =
-                                        Utils(activity!!).prepareFilePart(
-                                            "profileImage",
-                                            f1
-                                        )
-                                }
-                                if (UtilsFunctions.isNetworkConnected()) {
-                                    baseActivity.startProgressDialog()
-                                    profieViewModel.updateProfile(mHashMap, userImage)
-                                }
-
-                            }*/
-
-
                 }
             })
         )
+        docVerifyViewModel.getDocVerify().observe(this,
+            Observer<LoginResponse> { response->
+                stopProgressDialog()
+                if (response != null) {
+                    val message = response.message
+                    when {
+                        response.code == 200 -> {
+                            Intent(this, LandingActivty::class.java)
+                            startActivity(intent)
+                            message?.let { UtilsFunctions.showToastSuccess(it) }
+                        }
+                        else -> message?.let { UtilsFunctions.showToastError(it) }
+                    }
 
+                }
+            })
 
     }
 

@@ -55,6 +55,84 @@ class OrderDetailRepository {
 
     }
 
+    fun acceptOrder(
+        jsonObject: JsonObject?,
+        acceptOrderData: MutableLiveData<CommonModel>?
+    ): MutableLiveData<CommonModel> {
+        if (UtilsFunctions.isNetworkConnected() && jsonObject != null) {
+            val mApiService = ApiService<JsonObject>()
+            mApiService.get(
+                object : ApiResponse<JsonObject> {
+                    override fun onResponse(mResponse: Response<JsonObject>) {
+                        val data = gson.fromJson<CommonModel>(
+                            "" + mResponse.body()!!,
+                            CommonModel::class.java
+                        )
+                        acceptOrderData!!.postValue(data)
+                    }
+
+                    override fun onError(mKey: String) {
+                        acceptOrderData!!.value = null
+                        UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
+                    }
+                }, ApiClient.getApiInterface().acceptOrder(jsonObject)
+            )
+        }
+        return acceptOrderData!!
+    }
+
+    fun pickupOrder(
+        jsonObject: JsonObject?,
+        pickupOrderData: MutableLiveData<CommonModel>?
+    ): MutableLiveData<CommonModel> {
+        if (UtilsFunctions.isNetworkConnected() && jsonObject != null) {
+            val mApiService = ApiService<JsonObject>()
+            mApiService.get(
+                object : ApiResponse<JsonObject> {
+                    override fun onResponse(mResponse: Response<JsonObject>) {
+                        val data = gson.fromJson<CommonModel>(
+                            "" + mResponse.body()!!,
+                            CommonModel::class.java
+                        )
+                        pickupOrderData!!.postValue(data)
+                    }
+
+                    override fun onError(mKey: String) {
+                        pickupOrderData!!.value = null
+                        UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
+                    }
+                }, ApiClient.getApiInterface().pickupOrder(jsonObject)
+            )
+        }
+        return pickupOrderData!!
+    }
+
+    fun completeOrder(
+        jsonObject: JsonObject?,
+        completeOrderData: MutableLiveData<CommonModel>?
+    ): MutableLiveData<CommonModel> {
+        if (UtilsFunctions.isNetworkConnected() && jsonObject != null) {
+            val mApiService = ApiService<JsonObject>()
+            mApiService.get(
+                object : ApiResponse<JsonObject> {
+                    override fun onResponse(mResponse: Response<JsonObject>) {
+                        val data = gson.fromJson<CommonModel>(
+                            "" + mResponse.body()!!,
+                            CommonModel::class.java
+                        )
+                        completeOrderData!!.postValue(data)
+                    }
+
+                    override fun onError(mKey: String) {
+                        completeOrderData!!.value = null
+                        UtilsFunctions.showToastError(MyApplication.instance.getString(R.string.internal_server_error))
+                    }
+                }, ApiClient.getApiInterface().completeOrder(jsonObject)
+            )
+        }
+        return completeOrderData!!
+    }
+
     fun getLoginData(jsonObject : JsonObject?) : MutableLiveData<LoginResponse> {
         if (jsonObject != null) {
             val mApiService = ApiService<JsonObject>()

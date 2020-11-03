@@ -1,5 +1,6 @@
 package com.courierdriver.adapters.orders
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import com.courierdriver.R
 import com.courierdriver.databinding.RowOrderListBinding
 import com.courierdriver.model.order.OrderListModel
 import com.courierdriver.views.home.fragments.HomeFragment
+import com.courierdriver.views.orders.OrderDetailsActivity
 
 class HomeOrdersAdapter(
     var mContext: HomeFragment,
@@ -34,7 +36,6 @@ class HomeOrdersAdapter(
     override fun onBindViewHolder(@NonNull holder: ViewHolder, position: Int) {
         viewHolder = holder
         holder.binding!!.model = orderList!![position]
-
         setOrderButtons(holder.binding)
         setAdapter(holder.binding, orderList!![position].deliveryAddress)
     }
@@ -98,6 +99,12 @@ class HomeOrdersAdapter(
             }
             binding!!.tvActiveCancelOrder.setOnClickListener {
                 mContext.cancelOrder(orderList!![adapterPosition].id)
+            }
+            binding!!.cvOrderList.setOnClickListener {
+                val intent = Intent(mContext.activity, OrderDetailsActivity::class.java)
+                intent.putExtra("id", orderList!![adapterPosition].id)
+                intent.putExtra("active", "true")
+                mContext.startActivity(intent)
             }
         }
     }

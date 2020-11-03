@@ -103,6 +103,11 @@ class ForgotPasswrodActivity : BaseActivity() {
                             GlobalConstants.USERID,
                             forgotResponse.data!!.id
                         )
+                        SharedPrefClass().putObject(
+                            MyApplication.instance,
+                            GlobalConstants.USER_ID,
+                            forgotResponse.data!!.id
+                        )
                         //showToastSuccess(message!!)
                         GlobalConstants.VERIFICATION_TYPE = "forgot"
                         //TODO--FirebaseFunctions.sendOTP("login", mOtpJsonObject, this)

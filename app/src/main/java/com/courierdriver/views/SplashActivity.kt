@@ -77,10 +77,10 @@ class SplashActivity : BaseActivity() {
         )
             login = sharedPrefClass!!.getPrefValue(this, "isLogin").toString()
         val intent = if (login == "true") {
-             Intent(this, OrderDetailsActivity::class.java)
+             Intent(this, LandingActivty::class.java)
            // Intent(this, TutorialActivity::class.java)
         } else {
-             Intent(this, OrderDetailsActivity::class.java)
+             Intent(this, LoginActivity::class.java)
            // Intent(this, TutorialActivity::class.java)
 
         }
