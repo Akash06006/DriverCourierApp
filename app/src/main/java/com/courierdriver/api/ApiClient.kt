@@ -86,7 +86,7 @@ object ApiClient {
                     val original = chain.request()
                     val builder = original.newBuilder()
                         .header("Authorization", finalMAuthToken)
-                        .header("companyId", "c")
+                        .header("companyId", "25cbf58b-46ba-4ba2-b25d-8f8f653e9f11")
                         .header("lang", lang)
                     val request = builder.build()
                     val response = chain.proceed(request)

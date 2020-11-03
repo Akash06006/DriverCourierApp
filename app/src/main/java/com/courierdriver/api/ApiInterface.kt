@@ -6,7 +6,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
-import java.util.HashMap
+import java.util.*
 
 interface ApiInterface {
     @get:GET("user-profile-detail/")
@@ -142,13 +142,17 @@ interface ApiInterface {
     fun bookForGuest(@Body mJsonObject : JsonObject) : Call<JsonObject>
 
     @POST("outlet-group-services-by-date/")
-    fun getClassesListByDate(@Body mJsonObject : JsonObject) : Call<JsonObject>
+    fun getClassesListByDate(@Body mJsonObject: JsonObject): Call<JsonObject>
 
     @GET("delivery/orders/list")
-    fun orderList(@Query("orderStatus") orderStatus : String, @Query("driverLat") driverLat : String, @Query("driverLong") driverLong  : String) : Call<JsonObject>
+    fun orderList(
+        @Query("orderStatus") orderStatus: String,
+        @Query("driverLat") driverLat: String,
+        @Query("driverLong") driverLong: String
+    ): Call<JsonObject>
 
     @POST("delivery/orders/acceptOrder")
-    fun acceptOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
+    fun acceptOrder(@Body mJsonObject: JsonObject): Call<JsonObject>
 
     @POST("delivery/orders/orderPickup")
     fun pickupOrder(@Body mJsonObject : JsonObject) : Call<JsonObject>
@@ -158,4 +162,7 @@ interface ApiInterface {
 
     @GET("delivery/orders/cancelReq")
     fun cancelRequests(@Body mJsonObject : JsonObject) : Call<JsonObject>
+
+    @GET("delivery/orders/cancelReasons")
+    fun cancelReasons(): Call<JsonObject>
 }
